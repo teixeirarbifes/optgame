@@ -19,6 +19,7 @@ from datetime import datetime
 
 # Importar configurações
 from config.constants import GameConfig
+from controller.controller import GameController
 
 class JogoEconomicoImersivo(QMainWindow):
     def __init__(self):
@@ -64,6 +65,9 @@ class JogoEconomicoImersivo(QMainWindow):
         self.recursos_base = GameConfig.RECURSOS_BASE.copy()
         self.custos_unitarios_recursos = GameConfig.CUSTOS_UNITARIOS_RECURSOS.copy()
         self.produtos = GameConfig.get_produtos_inicializados()
+
+        # Camada de controle para regras de negócio
+        self.controller = GameController(self)
 
         # Configurar tema escuro
         self.configurar_tema_escuro()
@@ -140,44 +144,15 @@ class JogoEconomicoImersivo(QMainWindow):
     
     def _garantir_estruturas_empresa(self, nome_empresa):
         """Garante que dicionários auxiliares da empresa existam (retrocompatibilidade)."""
-        empresa = self.empresas.get(nome_empresa, {})
-
-        if 'historico_iteracoes' not in empresa:
-            empresa['historico_iteracoes'] = []
-
-        if 'historico_recursos' not in empresa:
-            empresa['historico_recursos'] = {
-                'turnos': [],
-                'dinheiro': [],
-                'materia_prima': [],
-                'energia': [],
-                'trabalhadores': [],
-            }
-
-        else:
-            historico = empresa['historico_recursos']
-            historico.setdefault('turnos', [])
-            historico.setdefault('dinheiro', [])
-            historico.setdefault('materia_prima', [])
-            historico.setdefault('energia', [])
-            historico.setdefault('trabalhadores', [])
-
-        empresa.setdefault('historico_decisoes', [])
-        empresa.setdefault('producao_atual', {})
+        self.controller.garantir_estruturas_empresa(nome_empresa)
 
     def calcular_custo_financeiro_produto(self, produto, quantidade=1):
         """Retorna o custo monetário associado à produção de um produto"""
-        dados = self.produtos.get(produto, {})
-        custo_unitario = dados.get('custo_dinheiro', 0)
-        return custo_unitario * quantidade
+        return self.controller.calcular_custo_financeiro_produto(produto, quantidade)
 
     def calcular_custo_total_plano(self, variaveis_decisao):
         """Soma o custo financeiro total do plano de produção"""
-        custo_total = 0
-        for produto, quantidade in variaveis_decisao.items():
-            if quantidade > 0:
-                custo_total += self.calcular_custo_financeiro_produto(produto, quantidade)
-        return custo_total
+        return self.controller.calcular_custo_total_plano(variaveis_decisao)
 
     def configurar_tema_escuro(self):
         """Configura o tema escuro da aplicação"""
@@ -4384,86 +4359,24 @@ Simulação realizada em: {datetime.now().strftime('%H:%M:%S')}
     
     def executar_turno(self):
         """Executa um turno completo para todas as empresas"""
-        # Verificar se há produção programada (com quantidades > 0)
-        tem_producao = any(
-            any(qtd > 0 for qtd in self.empresas[empresa]['producao_atual'].values()) 
-            for empresa in self.nomes_empresas 
-            if self.empresas[empresa]['producao_atual']
-        )
-        
-        if not tem_producao:
+        resultado = self.controller.executar_turno()
+
+        if resultado.status == "sem_producao":
             QMessageBox.warning(self, "Aviso", "Nenhuma empresa programou produção!")
             return
-            
-        if self.turno_atual > self.max_turnos:
+
+        if resultado.status == "fim_jogo":
             QMessageBox.information(self, "Fim", "Jogo finalizado!")
+            if resultado.jogo_finalizado:
+                self.mostrar_resultado_final_multi()
             return
-        
-        relatorio_geral = f"📊 RELATÓRIO TURNO {self.turno_atual}\n" + "="*50 + "\n"
-        
-        # Processar cada empresa
-        for nome_empresa in self.nomes_empresas:
-            self._garantir_estruturas_empresa(nome_empresa)
-            empresa = self.empresas[nome_empresa]
-            lucro_turno = 0
-            
-            relatorio_geral += f"\n🏢 {nome_empresa}:\n"
-            
-            for produto, quantidade in empresa['producao_atual'].items():
-                if quantidade > 0:
-                    dados = self.produtos[produto]
-                    
-                    # Consumir recursos
-                    empresa['recursos_disponiveis']['materia_prima'] -= dados['custo_materia'] * quantidade
-                    empresa['recursos_disponiveis']['energia'] -= dados['custo_energia'] * quantidade
-                    empresa['recursos_disponiveis']['trabalhadores'] -= dados['custo_trabalhadores'] * quantidade
-                    
-                    # Investimento financeiro
-                    custo_financeiro = self.calcular_custo_financeiro_produto(produto, quantidade)
-                    empresa['recursos_disponiveis']['dinheiro'] -= custo_financeiro
-                    
-                    # Gerar receita
-                    receita = dados['preco_venda'] * quantidade
-                    empresa['recursos_disponiveis']['dinheiro'] += receita
-                    lucro_produto = receita - custo_financeiro
-                    lucro_turno += lucro_produto
-                    
-                    relatorio_geral += (
-                        f"  • {produto}: {quantidade} unidades → Receita ${receita:,} | "
-                        f"Custo ${custo_financeiro:,} | Lucro ${lucro_produto:,}\n"
-                    )
-            
-            # Atualizar histórico
-            empresa['historico_recursos']['turnos'].append(self.turno_atual)
-            for recurso, valor in empresa['recursos_disponiveis'].items():
-                empresa['historico_recursos'][recurso].append(valor)
-            
-            # Salvar decisão
-            empresa['historico_decisoes'].append({
-                'turno': self.turno_atual,
-                'producao': empresa['producao_atual'].copy(),
-                'lucro': lucro_turno,
-                'recursos_apos': empresa['recursos_disponiveis'].copy()
-            })
-            
-            # Limpar produção atual
-            empresa['producao_atual'] = {}
-            
-            relatorio_geral += f"  💰 Lucro: ${lucro_turno:,}\n"
-        
-        # Avançar turno (sync both variables for compatibility)
-        self.turno_atual += 1
-        self.iteracao_atual = self.turno_atual
-        
-        # Atualizar interface
+
         self.atualizar_todas_interfaces()
-        
-        relatorio_geral += f"\n🎯 Próximo turno: {self.turno_atual}\n"
-        
-        QMessageBox.information(self, "Turno Executado", relatorio_geral)
-        
-        # Verificar fim do jogo
-        if self.turno_atual > self.max_turnos:
+
+        if resultado.relatorio:
+            QMessageBox.information(self, "Turno Executado", resultado.relatorio)
+
+        if resultado.jogo_finalizado:
             self.mostrar_resultado_final_multi()
     
     def atualizar_todas_interfaces(self):
