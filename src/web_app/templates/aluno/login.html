@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Login Empresa{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center" style="min-height: 80vh; align-items: center;">
+        <div class="col-md-6 col-lg-5">
+            <div class="card">
+                <div class="card-header text-center py-4">
+                    <h4 class="mb-0">
+                        <i class="bi bi-building"></i> Acesso da Empresa
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome da Empresa</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-building"></i>
+                                </span>
+                                <select class="form-select" id="nome" name="nome" required autofocus>
+                                    <option value="">Selecione sua empresa...</option>
+                                    {% for empresa in empresas %}
+                                    <option value="{{ empresa }}">{{ empresa }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="senha" class="form-label">Senha de Acesso</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-key-fill"></i>
+                                </span>
+                                <input type="password" class="form-control" id="senha" name="senha" 
+                                       placeholder="Digite a senha da empresa" required>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg btn-custom" id="btnEntrar">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar
+                            </button>
+                            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-custom">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if empresas|length == 0 %}
+            <div class="alert alert-info mt-4 text-center">
+                <i class="bi bi-info-circle"></i> Nenhuma empresa cadastrada ainda. 
+                Entre em contato com o professor.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Garantir que não exista sessão anterior
+    try {
+        sessionStorage.removeItem('optgame_session_id');
+    } catch (err) {
+        console.warn('Não foi possível limpar sessionStorage:', err);
+    }
+
+    // Submissão do formulário via AJAX
+    $('#loginForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const nome = $('#nome').val();
+        const senha = $('#senha').val();
+        const $btnEntrar = $('#btnEntrar');
+        
+        // Validação
+        if (!nome || !senha) {
+            showToast('Preencha todos os campos', 'warning');
+            return;
+        }
+        
+        // Desabilitar botão e mostrar loading
+        $btnEntrar.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Entrando...');
+        
+        // Fazer login via AJAX
+        $.ajax({
+            url: '{{ url_for("aluno.login") }}',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ nome, senha }),
+            success: function(response) {
+                if (response.sucesso) {
+                    // Salvar session_id no sessionStorage
+                    sessionStorage.setItem('optgame_session_id', response.session_id);
+                    
+                    showToast('Login realizado com sucesso!', 'success');
+                    // Redirecionar para o dashboard
+                    setTimeout(() => {
+                        window.location.href = response.redirect || '{{ url_for("aluno.dashboard") }}';
+                    }, 500);
+                } else {
+                    showToast(response.mensagem || 'Erro ao fazer login', 'danger');
+                    $btnEntrar.prop('disabled', false).html('<i class="bi bi-box-arrow-in-right"></i> Entrar');
+                }
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                const message = response?.mensagem || 'Erro ao conectar com o servidor';
+                showToast(message, 'danger');
+                $btnEntrar.prop('disabled', false).html('<i class="bi bi-box-arrow-in-right"></i> Entrar');
+            }
+        });
+    });
+    
+    // Focus no campo de senha ao selecionar empresa
+    $('#nome').on('change', function() {
+        if ($(this).val()) {
+            $('#senha').focus();
+        }
+    });
+});
+</script>
+{% endblock %}

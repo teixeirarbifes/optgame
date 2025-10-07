@@ -1,0 +1,25 @@
+# Dependências para a versão Web do Jogo de Produção
+# Instale com: pip install -r requirements_web.txt
+
+# Framework Web
+Flask==3.0.0
+Flask-Session==0.5.0
+
+# Dependências do sistema original
+PySide6==6.7.0
+matplotlib==3.8.0
+numpy==1.24.0
+
+# API (se quiser manter compatibilidade com a versão FastAPI)
+fastapi==0.110.0
+uvicorn==0.27.0
+jinja2==3.1.0
+
+# Utilidades
+python-dotenv==1.0.0
+
+# Otimização
+PuLP==2.8.0
+
+# Produção (opcional)
+gunicorn==21.2.0

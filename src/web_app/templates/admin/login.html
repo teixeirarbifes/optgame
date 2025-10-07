@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Login Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center" style="min-height: 80vh; align-items: center;">
+        <div class="col-md-5 col-lg-4">
+            <div class="card">
+                <div class="card-header text-center py-4">
+                    <h4 class="mb-0">
+                        <i class="bi bi-shield-lock-fill"></i> Acesso Administrativo
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('admin.login') }}">
+                        <div class="mb-4">
+                            <label for="senha" class="form-label">Senha de Administrador</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-key-fill"></i>
+                                </span>
+                                <input type="password" class="form-control" id="senha" name="senha" 
+                                       placeholder="Digite a senha" required autofocus>
+                            </div>
+                            <div class="form-text">Senha padrão: admin123</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg btn-custom">
+                                <i class="bi bi-box-arrow-in-right"></i> Entrar
+                            </button>
+                            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-custom">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

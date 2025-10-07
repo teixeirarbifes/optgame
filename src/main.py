@@ -1,6 +1,9 @@
 ﻿import sys
 import os
 import tempfile
+import secrets
+import string
+from typing import Optional
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                                QHBoxLayout, QGridLayout, QLabel, QPushButton, 
                                QLineEdit, QTextEdit, QTabWidget, QFrame, 
@@ -20,6 +23,7 @@ from datetime import datetime
 # Importar configurações
 from config.constants import GameConfig
 from controller.controller import GameController
+from server import WebPortal
 
 class JogoEconomicoImersivo(QMainWindow):
     def __init__(self):
@@ -69,6 +73,11 @@ class JogoEconomicoImersivo(QMainWindow):
         # Camada de controle para regras de negócio
         self.controller = GameController(self)
 
+        # Portal web educacional
+        self.web_portal: Optional[WebPortal] = None
+        self.portal_credenciais: dict[str, dict[str, str]] = {}
+        self._portal_info_mostrada = False
+
         # Configurar tema escuro
         self.configurar_tema_escuro()
 
@@ -101,6 +110,9 @@ class JogoEconomicoImersivo(QMainWindow):
         self.atualizar_graficos()
         self.atualizar_todas_interfaces()
         self.salvar_estado_temporario()
+        self._sincronizar_portal_empresas()
+        self.iniciar_portal_web()
+        self._exibir_portal_info_inicial()
     
     def inicializar_empresas(self):
         """Inicializa os dados de cada empresa"""
@@ -145,6 +157,126 @@ class JogoEconomicoImersivo(QMainWindow):
     def _garantir_estruturas_empresa(self, nome_empresa):
         """Garante que dicionários auxiliares da empresa existam (retrocompatibilidade)."""
         self.controller.garantir_estruturas_empresa(nome_empresa)
+
+    # ------------------------------------------------------------------
+    # Portal web educacional
+    # ------------------------------------------------------------------
+    def _slugificar_empresa(self, nome: str) -> str:
+        slug = ''.join(ch.lower() if ch.isalnum() else '-' for ch in nome)
+        slug = '-'.join(part for part in slug.split('-') if part)
+        return slug or "empresa"
+
+    def _gerar_senha_portal(self) -> str:
+        caracteres = string.ascii_uppercase + string.digits
+        tamanho = getattr(GameConfig, "PORTAL_PASSWORD_SIZE", 8)
+        return ''.join(secrets.choice(caracteres) for _ in range(max(6, tamanho)))
+
+    def _sincronizar_portal_empresas(self) -> None:
+        if not GameConfig.PORTAL_ENABLED:
+            return
+
+        slug_ocorrencias: dict[str, str] = {}
+        credenciais_atuais: dict[str, dict[str, str]] = {}
+
+        for nome in self.nomes_empresas:
+            empresa = self.empresas.setdefault(nome, {})
+            portal_info = empresa.setdefault('portal', {})
+
+            slug_base = portal_info.get('slug') or self._slugificar_empresa(nome)
+            slug = slug_base
+            contador = 1
+            while slug in slug_ocorrencias and slug_ocorrencias[slug] != nome:
+                contador += 1
+                slug = f"{slug_base}-{contador}"
+
+            slug_ocorrencias[slug] = nome
+            portal_info['slug'] = slug
+
+            senha = portal_info.get('senha') or self._gerar_senha_portal()
+            portal_info['senha'] = senha
+
+            empresa['portal'] = portal_info
+            credenciais_atuais[nome] = {
+                'senha': senha,
+                'slug': slug,
+            }
+
+        self.portal_credenciais = credenciais_atuais
+
+    def iniciar_portal_web(self) -> None:
+        if not GameConfig.PORTAL_ENABLED:
+            return
+        if self.web_portal is None:
+            try:
+                self.web_portal = WebPortal(self)
+                self.web_portal.start()
+            except Exception as exc:  # pragma: no cover - proteção runtime
+                print(f"[Portal] Falha ao iniciar portal web: {exc}")
+                self.web_portal = None
+
+    def obter_urls_portal(self) -> tuple[str, str]:
+        base_local = f"http://localhost:{GameConfig.PORTAL_PORT}"
+        if GameConfig.PORTAL_HOST not in {"0.0.0.0", "127.0.0.1", "localhost"}:
+            base_local = f"http://{GameConfig.PORTAL_HOST}:{GameConfig.PORTAL_PORT}"
+
+        base_rede = base_local
+        if self.web_portal:
+            base_local = self.web_portal.base_url()
+            base_rede = self.web_portal.network_url()
+
+        return base_local, base_rede
+
+    def obter_url_portal(self) -> str:
+        base_local, _ = self.obter_urls_portal()
+        return base_local
+
+    def mostrar_portal_credenciais(self) -> None:
+        if not GameConfig.PORTAL_ENABLED:
+            QMessageBox.information(self, "Portal", "O portal está desativado na configuração.")
+            return
+
+        if not self.portal_credenciais:
+            QMessageBox.information(
+                self,
+                "Portal",
+                "Nenhuma credencial disponível ainda. Finalize a configuração das empresas e execute ao menos um autosave.",
+            )
+            return
+
+        base_local, base_rede = self.obter_urls_portal()
+        linhas = []
+        for nome, dados in self.portal_credenciais.items():
+            local_url = f"{base_local}/empresa/{dados['slug']}"
+            rede_url = f"{base_rede}/empresa/{dados['slug']}"
+            linhas.append(
+                "\n".join(
+                    [
+                        f"🏢 {nome}",
+                        f"Local: {local_url}",
+                        f"Rede: {rede_url}",
+                        f"Senha: {dados['senha']}",
+                    ]
+                )
+            )
+
+        info_acesso = "\n".join(
+            [
+                f"🔗 Acesso local: {base_local}",
+                f"🌐 Acesso na rede: {base_rede}",
+                "",
+            ]
+        )
+        mensagem = info_acesso + "\n\n".join(linhas)
+        QMessageBox.information(
+            self,
+            "Portal Educacional",
+            "Compartilhe cada senha apenas com a equipe correspondente:\n\n" + mensagem,
+        )
+
+    def _exibir_portal_info_inicial(self) -> None:
+        if not self._portal_info_mostrada:
+            self._portal_info_mostrada = True
+            self.mostrar_portal_credenciais()
 
     def calcular_custo_financeiro_produto(self, produto, quantidade=1):
         """Retorna o custo monetário associado à produção de um produto"""
@@ -288,7 +420,7 @@ class JogoEconomicoImersivo(QMainWindow):
         
         # Footer
         self.criar_footer(main_layout)
-    
+
     def criar_header_geral(self, parent_layout):
         """Cria o cabeçalho geral da aplicação (compacto)"""
         header_frame = QFrame()
@@ -2446,6 +2578,7 @@ class JogoEconomicoImersivo(QMainWindow):
 
             # Autosave após atualizar a interface
             self.salvar_estado_temporario()
+            self._sincronizar_portal_empresas()
             
             relatorio_geral += f"\n🎯 Próxima iteração: {self.iteracao_atual}\n"
             
@@ -4207,6 +4340,13 @@ class JogoEconomicoImersivo(QMainWindow):
         """Mostra o modelo matemático do sistema"""
         dialog = ModeloMatematicoDialog(self)
         dialog.exec()
+
+    def closeEvent(self, event):  # type: ignore[override]
+        try:
+            if self.web_portal:
+                self.web_portal.stop()
+        finally:
+            super().closeEvent(event)
     
     # Métodos legados (removidos para compatibilidade)
     def simular_producao(self, produto):
@@ -6030,121 +6170,7 @@ class ModeloMatematicoDialog(QDialog):
         text_modelo.setStyleSheet("font-family: Courier; font-size: 11px;")
         layout.addWidget(text_modelo)
         
-        modelo_matematico = """
-📐 MODELO MATEMÁTICO DO SIMULADOR EMPRESARIAL
-═══════════════════════════════════════════════════════════════
-
-🎯 FUNÇÃO OBJETIVO:
-    Maximizar Z = Σ(i=1 a n) [pi × qi] - Σ(j=1 a m) [rj × Σ(i=1 a n) cij × qi]
-    
-    Onde:
-    Z = Lucro total da empresa
-    pi = Preço de venda do produto i
-    qi = Quantidade produzida do produto i
-    cij = Consumo do recurso j para produzir 1 unidade do produto i
-    rj = Custo unitário do recurso j
-
-⚖️ RESTRIÇÕES DO SISTEMA:
-
-    1) RESTRIÇÃO DE MATÉRIA-PRIMA:
-       Σ(i=1 a n) c1i × qi ≤ R1
-       
-    2) RESTRIÇÃO DE ENERGIA:
-       Σ(i=1 a n) c2i × qi ≤ R2
-       
-    3) RESTRIÇÃO DE TRABALHADORES:
-       Σ(i=1 a n) c3i × qi ≤ R3
-       
-    4) RESTRIÇÃO DE CAPITAL:
-       Σ(i=1 a n) Σ(j=1 a m) cij × rj × qi ≤ D
-       
-    5) RESTRIÇÕES DE NÃO-NEGATIVIDADE:
-       qi ≥ 0, para todo i
-
-📊 VARIÁVEIS DO MODELO:
-
-    🔸 VARIÁVEIS DE DECISÃO:
-       q1 = Quantidade de Smartphones a produzir
-       q2 = Quantidade de Laptops a produzir  
-       q3 = Quantidade de Desktops a produzir
-
-    🔸 PARÂMETROS FIXOS:
-       p1 = $180 (preço Smartphone)
-       p2 = $350 (preço Laptop)
-       p3 = $480 (preço Desktop)
-
-    🔸 MATRIZ DE COEFICIENTES TÉCNICOS:
-       
-       Recurso          | Smartphone | Laptop | Desktop |
-       ─────────────────┼────────────┼────────┼─────────┤
-       Matéria-prima    |     45     |   85   |   120   |
-       Energia          |     25     |   60   |    80   |
-       Trabalhadores    |      3     |    5   |     7   |
-
-     🔸 RECURSOS DISPONÍVEIS (por turno):
-         R1 = 2500  (matéria-prima inicial)
-         R2 = 3500  (energia inicial)
-         R3 = 100   (trabalhadores inicial)
-         D  = $50000 (capital inicial)
-
-     🔸 CUSTOS UNITÁRIOS DOS RECURSOS (rj):
-         Matéria-prima      → $12,00 por unidade
-         Energia            → $0,45 por unidade
-         Trabalhadores      → $28,00 por colaborador-hora
-         Capital (dinheiro) → $1,00 por dólar disponível
-
-🔄 DINÂMICA TEMPORAL:
-
-    EVOLUÇÃO DOS RECURSOS NO TURNO t:
-    
-    R1(t+1) = R1(t) - Σ(i=1 a 3) c1i × qi(t)
-    R2(t+1) = R2(t) - Σ(i=1 a 3) c2i × qi(t)  
-    R3(t+1) = R3(t) - Σ(i=1 a 3) c3i × qi(t)
-    D(t+1) = D(t) + Σ(i=1 a 3) pi × qi(t) - Σ(j=1 a m) rj × Σ(i=1 a 3) cij × qi(t)
-
-📈 FUNÇÃO DE PERFORMANCE:
-
-    LUCRO NO TURNO t:
-    L(t) = Σ(i=1 a 3) pi × qi(t) - Σ(j=1 a m) rj × Σ(i=1 a 3) cij × qi(t)
-    
-    LUCRO ACUMULADO ATÉ TURNO T:
-    LA(T) = Σ(t=1 a T) L(t)
-    
-    EFICIÊNCIA DE RECURSOS:
-    E(t) = L(t) / [Σ(j=1 a m) rj × Σ(i=1 a 3) cij × qi(t)]
-
-🎲 MODELO ESTOCÁSTICO (Extensão):
-
-    Para cenários avançados, pode-se incluir:
-    
-    pi(t) = pi × (1 + εi(t))
-    
-    Onde εi(t) ~ N(0, σ²) representa flutuações de mercado
-
-🧮 ALGORITMO DE SOLUÇÃO:
-
-    1) INPUT: qi para i = 1,2,3
-    2) VERIFICAR: Σ cij × qi ≤ Rj para todo j e Σ rj × Σ cij × qi ≤ D
-    3) SE viável: CALCULAR custo_total = Σ rj × Σ cij × qi e lucro L(t) = Σ pi × qi - custo_total
-    4) ATUALIZAR: Rj(t+1) = Rj(t) - Σ cij × qi
-    5) OUTPUT: Novos recursos, custos e lucro
-
-🔍 ANÁLISE DE SENSIBILIDADE:
-
-    ∂Z/∂Rj = λj (multiplicador de Lagrange do recurso j)
-    
-    Interpretação: valor marginal de uma unidade adicional
-    do recurso j para o lucro total.
-
-═══════════════════════════════════════════════════════════════
-📚 CONCEITOS APLICADOS:
-• Programação Linear
-• Otimização com Restrições  
-• Análise de Recursos Limitados
-• Teoria da Decisão
-• Modelagem de Sistemas Produtivos
-═══════════════════════════════════════════════════════════════
-        """
+        modelo_matematico = GameConfig.get_modelo_matematico()
         
         text_modelo.setPlainText(modelo_matematico)
 

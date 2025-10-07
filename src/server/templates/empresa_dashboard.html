@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h2>🏢 {{ empresa.nome }} • Turno {{ empresa.turno_atual }} / {{ empresa.max_turnos }}</h2>
+    <p class="pill">Iteração atual: {{ empresa.iteracao_atual }} / {{ empresa.max_iteracoes }}</p>
+    <p style="margin-top:0.6rem;color:var(--text-muted);">
+        Este painel apresenta um snapshot em tempo real das decisões, restrições e métricas financeiras da empresa.
+        Os dados são atualizados sempre que o coordenador executa um novo turno no simulador principal.
+    </p>
+</section>
+
+<div class="grid cols-2" style="margin-top:1.2rem;">
+    <section class="card">
+        <h2>🎯 Função Objetivo</h2>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Receita projetada</th>
+                    <td>${{ "{:,.2f}".format(metricas.receita) }}</td>
+                </tr>
+                <tr>
+                    <th>Custos estimados</th>
+                    <td>${{ "{:,.2f}".format(metricas.custo) }}</td>
+                </tr>
+                <tr>
+                    <th>Lucro projetado</th>
+                    <td>${{ "{:,.2f}".format(metricas.lucro) }}</td>
+                </tr>
+                <tr>
+                    <th>Margem</th>
+                    <td>{{ "{:,.1f}".format(metricas.margem) }}%</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <section class="card">
+        <h2>💡 Dicas automáticas</h2>
+        <ul>
+            {% for dica in dicas %}
+                <li>{{ dica }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+</div>
+
+<section class="card" style="margin-top:1.2rem;">
+    <h2>⚖️ Restrições e folgas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Recurso</th>
+                <th>Disponível</th>
+                <th>Consumo</th>
+                <th>Folga</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in folgas %}
+            <tr>
+                <td>{{ item.nome }}</td>
+                <td>{{ "{:,.0f}".format(item.disponivel) }}</td>
+                <td>{{ "{:,.0f}".format(item.consumo) }}</td>
+                <td>{{ "{:,.0f}".format(item.folga) }}</td>
+                <td>
+                    {% set css = "pill ok" %}
+                    {% if item.status == "deficit" %}
+                        {% set css = "pill deficit" %}
+                    {% elif item.status == "atenção" %}
+                        {% set css = "pill atencao" %}
+                    {% endif %}
+                    <span class="{{ css }}">
+                        {% if item.status == "deficit" %}Déficit{% elif item.status == "atenção" %}Atenção{% else %}OK{% endif %}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<div class="grid cols-2" style="margin-top:1.2rem;">
+    <section class="card">
+        <h2>📊 Plano atual</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for produto, quantidade in variaveis_decisao.items() %}
+                <tr>
+                    <td>{{ produto }}</td>
+                    <td>{{ "{:,.0f}".format(quantidade) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    <section class="card">
+        <h2>📚 Histórico de decisões</h2>
+        {% if not historico_decisoes %}
+            <p style="color:var(--text-muted);">Nenhum turno executado ainda.</p>
+        {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Turno</th>
+                    <th>Produção</th>
+                    <th>Lucro</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in historico_decisoes %}
+                <tr>
+                    <td>{{ registro.turno }}</td>
+                    <td>
+                        {% for produto, qtd in registro.producao.items() %}
+                            <div>{{ produto }}: {{ "{:,.0f}".format(qtd) }}</div>
+                        {% endfor %}
+                    </td>
+                    <td>${{ "{:,.2f}".format(registro.lucro) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </section>
+</div>
+
+<section class="card" style="margin-top:1.2rem;">
+    <h2>📈 Histórico de recursos</h2>
+    {% if not historico_recursos %}
+        <p style="color:var(--text-muted);">Execute ao menos um turno para registrar os recursos disponíveis.</p>
+    {% else %}
+    <table>
+        <thead>
+            <tr>
+                <th>Turno</th>
+                <th>Dinheiro</th>
+                <th>Matéria-prima</th>
+                <th>Energia</th>
+                <th>Trabalhadores</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for linha in historico_recursos %}
+            <tr>
+                <td>{{ linha.turno }}</td>
+                <td>${{ "{:,.0f}".format(linha.dinheiro or 0) }}</td>
+                <td>{{ "{:,.0f}".format(linha.materia_prima or 0) }}</td>
+                <td>{{ "{:,.0f}".format(linha.energia or 0) }}</td>
+                <td>{{ "{:,.0f}".format(linha.trabalhadores or 0) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</section>
+
+<section class="card" style="margin-top:1.2rem;">
+    <h2>📐 Modelo Matemático</h2>
+    <pre class="modelo">{{ modelo_matematico }}</pre>
+</section>
+
+<section class="card" style="margin-top:1.2rem;">
+    <h2>🧮 Dados do problema</h2>
+    <div class="grid cols-2">
+        <div class="card" style="background:var(--card-alt);">
+            <h3>Produtos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço</th>
+                        <th>Matéria</th>
+                        <th>Energia</th>
+                        <th>Trabalhadores</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto, dados in constantes.produtos.items() %}
+                    <tr>
+                        <td>{{ produto }}</td>
+                        <td>${{ "{:,.0f}".format(dados.preco_venda) }}</td>
+                        <td>{{ "{:,.0f}".format(dados.custo_materia) }}</td>
+                        <td>{{ "{:,.0f}".format(dados.custo_energia) }}</td>
+                        <td>{{ "{:,.0f}".format(dados.custo_trabalhadores) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card" style="background:var(--card-alt);">
+            <h3>Custos unitários de recursos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        <th>Custo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recurso, valor in constantes.custos_unitarios.items() %}
+                    <tr>
+                        <td>{{ recurso | replace('_', ' ') | title }}</td>
+                        <td>${{ "{:,.2f}".format(valor) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h3 style="margin-top:1rem;">Recursos base</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recurso, valor in constantes.recursos_base.items() %}
+                    <tr>
+                        <td>{{ recurso | replace('_', ' ') | title }}</td>
+                        <td>{{ "{:,.0f}".format(valor) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

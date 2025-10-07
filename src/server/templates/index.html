@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h2>🚀 Como funciona</h2>
+    <p>
+        Cada empresa possui uma página exclusiva protegida por senha.
+        Compartilhe apenas o link e a senha correspondentes com a equipe responsável.
+    </p>
+    <p style="margin-top:0.8rem;color:var(--text-muted);">
+        Este portal é apenas de leitura e atualiza os dados diretamente do simulador que está sendo executado na máquina do professor.
+    </p>
+</section>
+
+<section class="card" style="margin-top:1.2rem;">
+    <h2>🏢 Empresas Disponíveis</h2>
+    {% if not empresas %}
+        <p>Nenhuma empresa foi cadastrada ainda.</p>
+    {% else %}
+        <div class="grid cols-2">
+            {% for empresa in empresas %}
+            <div class="card" style="background:var(--card-alt);">
+                <h3>{{ empresa.nome }}</h3>
+                <p class="pill">Histórico de {{ empresa.historico }} turnos</p>
+                <a class="cta" href="/empresa/{{ empresa.slug }}">Acessar painel seguro →</a>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+<section class="card" style="margin-top:1.2rem;">
+    <h2>🧱 Estrutura do Problema</h2>
+    <div class="grid cols-2">
+        <div class="card" style="background:var(--card-alt);">
+            <h3>Recursos disponíveis (por turno)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recurso, valor in constantes.recursos_base.items() %}
+                    <tr>
+                        <td>{{ recurso | replace('_', ' ') | title }}</td>
+                        <td>{{ "{:,.0f}".format(valor) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card" style="background:var(--card-alt);">
+            <h3>Custo unitário dos recursos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        <th>Custo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recurso, valor in constantes.custos_unitarios.items() %}
+                    <tr>
+                        <td>{{ recurso | replace('_', ' ') | title }}</td>
+                        <td>${{ "{:,.2f}".format(valor) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,261 @@
+{
+  "iteracao_atual": 6,
+  "max_iteracoes": 12,
+  "empresas": {
+    "sd": {
+      "nome": "sd",
+      "equipe": "",
+      "senha": "12",
+      "recursos_base": {
+        "dinheiro": 60000,
+        "materia_prima": 25000,
+        "energia": 18000,
+        "trabalhadores": 800
+      },
+      "recursos_disponiveis": {
+        "dinheiro": 106384.1,
+        "materia_prima": 6185.0,
+        "energia": 8402.0,
+        "trabalhadores": 176.0
+      },
+      "decisao_atual": {},
+      "decisao_confirmada": false,
+      "historico": [
+        {
+          "turno": 4,
+          "decisao": {
+            "📱 Smartphone": 472,
+            "💻 Laptop": 0,
+            "�️ Desktop": 363,
+            "⌚ Smartwatch": 0,
+            "�️ Impressora": 0,
+            "📷 Câmera": 0
+          },
+          "receita": 0,
+          "custo": 0,
+          "lucro": 0,
+          "consumo": {
+            "materia_prima": 25230.0,
+            "energia": 12851.0,
+            "trabalhadores": 842.2,
+            "dinheiro": 69180.8
+          },
+          "violacoes": [
+            {
+              "recurso": "materia_prima",
+              "necessario": 25230.0,
+              "disponivel": 25000,
+              "deficit": 230.0
+            },
+            {
+              "recurso": "trabalhadores",
+              "necessario": 842.2,
+              "disponivel": 800,
+              "deficit": 42.200000000000045
+            }
+          ],
+          "recursos_apos": {
+            "dinheiro": 60000,
+            "materia_prima": 25000,
+            "energia": 18000,
+            "trabalhadores": 800
+          }
+        },
+        {
+          "turno": 5,
+          "decisao": {
+            "📱 Smartphone": 381,
+            "💻 Laptop": 0,
+            "�️ Desktop": 262,
+            "⌚ Smartwatch": 0,
+            "�️ Impressora": 0,
+            "📷 Câmera": 0
+          },
+          "receita": 97885.0,
+          "custo": 51500.9,
+          "lucro": 46384.1,
+          "consumo": {
+            "materia_prima": 18815.0,
+            "energia": 9598.0,
+            "trabalhadores": 624.0,
+            "dinheiro": 51500.9
+          },
+          "violacoes": null,
+          "recursos_apos": {
+            "dinheiro": 106384.1,
+            "materia_prima": 6185.0,
+            "energia": 8402.0,
+            "trabalhadores": 176.0
+          }
+        }
+      ],
+      "historico_decisoes": [],
+      "historico_recursos": {
+        "turnos": [
+          4,
+          5
+        ],
+        "dinheiro": [
+          60000,
+          106384.1
+        ],
+        "materia_prima": [
+          25000,
+          6185.0
+        ],
+        "energia": [
+          18000,
+          8402.0
+        ],
+        "trabalhadores": [
+          800,
+          176.0
+        ]
+      },
+      "lucro_total": 46384.1,
+      "criada_em": "2025-10-06T21:40:13.651902",
+      "lucro_ultimo_turno": 46384.1,
+      "historico_lucros": {
+        "turnos": [
+          4,
+          5
+        ],
+        "valores": [
+          0,
+          46384.1
+        ]
+      }
+    }
+  },
+  "iteracao_aberta": false,
+  "historico_global": [
+    {
+      "turno": 1,
+      "timestamp": "2025-10-06T21:40:06.084250",
+      "resultados": []
+    },
+    {
+      "turno": 2,
+      "timestamp": "2025-10-06T21:40:19.128429",
+      "resultados": [
+        {
+          "empresa": "sd",
+          "status": "pendente",
+          "mensagem": "Aguardando decisão"
+        }
+      ]
+    },
+    {
+      "turno": 3,
+      "timestamp": "2025-10-06T21:40:57.002592",
+      "resultados": [
+        {
+          "empresa": "sd",
+          "status": "pendente",
+          "mensagem": "Aguardando decisão"
+        }
+      ]
+    },
+    {
+      "turno": 4,
+      "timestamp": "2025-10-06T21:41:40.993485",
+      "resultados": [
+        {
+          "empresa": "sd",
+          "status": "processado",
+          "lucro": 0,
+          "detalhes": [
+            {
+              "status": "violação",
+              "mensagem": "Decisão não executada por recursos insuficientes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "turno": 5,
+      "timestamp": "2025-10-06T21:42:10.369659",
+      "resultados": [
+        {
+          "empresa": "sd",
+          "status": "processado",
+          "lucro": 46384.1,
+          "detalhes": [
+            {
+              "produto": "📱 Smartphone",
+              "quantidade": 381,
+              "receita": 32385,
+              "custo": 0,
+              "lucro": 32385
+            },
+            {
+              "produto": "�️ Desktop",
+              "quantidade": 262,
+              "receita": 65500,
+              "custo": 0,
+              "lucro": 65500
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "produtos": {
+    "📱 Smartphone": {
+      "consumo_materia": 15,
+      "consumo_energia": 8,
+      "consumo_trabalhadores": 0.4,
+      "preco_venda": 85,
+      "cor": "#E74C3C",
+      "emoji": "📱"
+    },
+    "💻 Laptop": {
+      "consumo_materia": 35,
+      "consumo_energia": 18,
+      "consumo_trabalhadores": 1.2,
+      "preco_venda": 180,
+      "cor": "#3498DB",
+      "emoji": "�"
+    },
+    "�️ Desktop": {
+      "consumo_materia": 50,
+      "consumo_energia": 25,
+      "consumo_trabalhadores": 1.8,
+      "preco_venda": 250,
+      "cor": "#9B59B6",
+      "emoji": "🖥️"
+    },
+    "⌚ Smartwatch": {
+      "consumo_materia": 8,
+      "consumo_energia": 4,
+      "consumo_trabalhadores": 0.3,
+      "preco_venda": 45,
+      "cor": "#1ABC9C",
+      "emoji": "⌚"
+    },
+    "�️ Impressora": {
+      "consumo_materia": 28,
+      "consumo_energia": 12,
+      "consumo_trabalhadores": 0.8,
+      "preco_venda": 120,
+      "cor": "#34495E",
+      "emoji": "🖨️"
+    },
+    "📷 Câmera": {
+      "consumo_materia": 22,
+      "consumo_energia": 10,
+      "consumo_trabalhadores": 0.6,
+      "preco_venda": 95,
+      "cor": "#E67E22",
+      "emoji": "�"
+    }
+  },
+  "auto_save_enabled": true,
+  "_metadata": {
+    "versao": "2.1",
+    "data_save": "2025-10-06T21:42:10.370648",
+    "total_empresas": 1,
+    "iteracao_atual": 6
+  }
+}

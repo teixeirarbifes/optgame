@@ -1,0 +1,1805 @@
+{
+  "iteracao_atual": 3,
+  "max_iteracoes": 12,
+  "turno_atual": 1,
+  "max_turnos": 12,
+  "nomes_empresas": [
+    "Flavia Company",
+    "Sem sunga",
+    "Little Sock",
+    "Pitch Guys",
+    "Farmetes",
+    "União"
+  ],
+  "equipes_empresas": {
+    "Flavia Company": {
+      "recursos": "Equipe Recursos A",
+      "producao": "Equipe Produção A",
+      "financas": "Equipe Finanças A"
+    },
+    "Sem sunga": {
+      "recursos": "Equipe Recursos B",
+      "producao": "Equipe Produção B",
+      "financas": "Equipe Finanças B"
+    },
+    "Little Sock": {
+      "recursos": "Equipe Recursos C",
+      "producao": "Equipe Produção C",
+      "financas": "Equipe Finanças C"
+    },
+    "Pitch Guys": {
+      "recursos": "Equipe Recursos D",
+      "producao": "Equipe Produção D",
+      "financas": "Equipe Finanças D"
+    },
+    "Farmetes": {
+      "recursos": "Equipe Recursos E",
+      "producao": "Equipe Produção E",
+      "financas": "Equipe Finanças E"
+    },
+    "União": {
+      "recursos": "Equipe Recursos F",
+      "producao": "Equipe Produção F",
+      "financas": "Equipe Finanças F"
+    }
+  },
+  "empresas": {
+    "Flavia Company": {
+      "recursos_disponiveis": {
+        "dinheiro": 50000,
+        "materia_prima": 2500,
+        "energia": 3500,
+        "trabalhadores": 100
+      },
+      "variaveis_decisao": {
+        "📱 Smartphone": 2,
+        "💻 Laptop": 2,
+        "🖥️ Desktop": 12
+      },
+      "historico_iteracoes": [
+        {
+          "iteracao": 1,
+          "variaveis_decisao": {
+            "📱 Smartphone": 1,
+            "💻 Laptop": 5,
+            "🖥️ Desktop": 10
+          },
+          "receita_total": 6730,
+          "violacoes": [],
+          "custo_total": 2893.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1670,
+              "restante": 830,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 45,
+                  "total": 45,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 5,
+                  "custo_unitario": 85,
+                  "total": 425,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 120,
+                  "total": 1200,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1125,
+              "restante": 2375,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 25,
+                  "total": 25,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 5,
+                  "custo_unitario": 60,
+                  "total": 300,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 80,
+                  "total": 800,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 98,
+              "restante": 2,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 3,
+                  "total": 3,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 5,
+                  "custo_unitario": 5,
+                  "total": 25,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 7,
+                  "total": 70,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 2893.0,
+              "restante": 47107.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 73,
+                  "total": 73,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 5,
+                  "custo_unitario": 150,
+                  "total": 750,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 207,
+                  "total": 2070,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        },
+        {
+          "iteracao": 2,
+          "variaveis_decisao": {
+            "📱 Smartphone": 2,
+            "💻 Laptop": 2,
+            "🖥️ Desktop": 12
+          },
+          "receita_total": 6820,
+          "violacoes": [],
+          "custo_total": 2930.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1700,
+              "restante": 800,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 45,
+                  "total": 90,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 85,
+                  "total": 170,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 12,
+                  "custo_unitario": 120,
+                  "total": 1440,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1130,
+              "restante": 2370,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 25,
+                  "total": 50,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 60,
+                  "total": 120,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 12,
+                  "custo_unitario": 80,
+                  "total": 960,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 100,
+              "restante": 0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 3,
+                  "total": 6,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 5,
+                  "total": 10,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 12,
+                  "custo_unitario": 7,
+                  "total": 84,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 2930.0,
+              "restante": 47070.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 73,
+                  "total": 146,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 150,
+                  "total": 300,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 12,
+                  "custo_unitario": 207,
+                  "total": 2484,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        }
+      ],
+      "historico_recursos": {
+        "turnos": [],
+        "dinheiro": [],
+        "materia_prima": [],
+        "energia": [],
+        "trabalhadores": []
+      },
+      "historico_decisoes": [],
+      "producao_atual": {},
+      "restricoes_violadas": [],
+      "objetivo_atual": 0,
+      "equipes": {
+        "recursos": "Equipe Recursos A",
+        "producao": "Equipe Produção A",
+        "financas": "Equipe Finanças A"
+      },
+      "portal": {
+        "slug": "flavia-company",
+        "senha": "DKG7ZSCQ"
+      }
+    },
+    "Sem sunga": {
+      "recursos_disponiveis": {
+        "dinheiro": 50000,
+        "materia_prima": 2500,
+        "energia": 3500,
+        "trabalhadores": 100
+      },
+      "variaveis_decisao": {
+        "📱 Smartphone": 0,
+        "💻 Laptop": 20,
+        "🖥️ Desktop": 0
+      },
+      "historico_iteracoes": [
+        {
+          "iteracao": 1,
+          "variaveis_decisao": {
+            "📱 Smartphone": 2,
+            "💻 Laptop": 1,
+            "🖥️ Desktop": 1
+          },
+          "receita_total": 1190,
+          "violacoes": [],
+          "custo_total": 503.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 295,
+              "restante": 2205,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 45,
+                  "total": 90,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 1,
+                  "custo_unitario": 85,
+                  "total": 85,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 120,
+                  "total": 120,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 190,
+              "restante": 3310,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 25,
+                  "total": 50,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 1,
+                  "custo_unitario": 60,
+                  "total": 60,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 80,
+                  "total": 80,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 18,
+              "restante": 82,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 3,
+                  "total": 6,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 1,
+                  "custo_unitario": 5,
+                  "total": 5,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 7,
+                  "total": 7,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 503.0,
+              "restante": 49497.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 2,
+                  "custo_unitario": 73,
+                  "total": 146,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 1,
+                  "custo_unitario": 150,
+                  "total": 150,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 207,
+                  "total": 207,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        },
+        {
+          "iteracao": 2,
+          "variaveis_decisao": {
+            "📱 Smartphone": 0,
+            "💻 Laptop": 20,
+            "🖥️ Desktop": 0
+          },
+          "receita_total": 7000,
+          "violacoes": [],
+          "custo_total": 3000.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1700,
+              "restante": 800,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 85,
+                  "total": 1700,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1200,
+              "restante": 2300,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 60,
+                  "total": 1200,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 100,
+              "restante": 0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 5,
+                  "total": 100,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 3000.0,
+              "restante": 47000.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 150,
+                  "total": 3000,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        }
+      ],
+      "historico_recursos": {
+        "turnos": [],
+        "dinheiro": [],
+        "materia_prima": [],
+        "energia": [],
+        "trabalhadores": []
+      },
+      "historico_decisoes": [],
+      "producao_atual": {},
+      "restricoes_violadas": [],
+      "objetivo_atual": 0,
+      "equipes": {
+        "recursos": "Equipe Recursos B",
+        "producao": "Equipe Produção B",
+        "financas": "Equipe Finanças B"
+      },
+      "portal": {
+        "slug": "sem-sunga",
+        "senha": "1RFB79S4"
+      }
+    },
+    "Little Sock": {
+      "recursos_disponiveis": {
+        "dinheiro": 50000,
+        "materia_prima": 2500,
+        "energia": 3500,
+        "trabalhadores": 100
+      },
+      "variaveis_decisao": {
+        "📱 Smartphone": 1,
+        "💻 Laptop": 16,
+        "🖥️ Desktop": 1
+      },
+      "historico_iteracoes": [
+        {
+          "iteracao": 1,
+          "variaveis_decisao": {
+            "📱 Smartphone": 5,
+            "💻 Laptop": 10,
+            "🖥️ Desktop": 5
+          },
+          "receita_total": 6800,
+          "violacoes": [],
+          "custo_total": 2900.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1675,
+              "restante": 825,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 45,
+                  "total": 225,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 10,
+                  "custo_unitario": 85,
+                  "total": 850,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 5,
+                  "custo_unitario": 120,
+                  "total": 600,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1125,
+              "restante": 2375,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 25,
+                  "total": 125,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 10,
+                  "custo_unitario": 60,
+                  "total": 600,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 5,
+                  "custo_unitario": 80,
+                  "total": 400,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 100,
+              "restante": 0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 3,
+                  "total": 15,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 10,
+                  "custo_unitario": 5,
+                  "total": 50,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 5,
+                  "custo_unitario": 7,
+                  "total": 35,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 2900.0,
+              "restante": 47100.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 73,
+                  "total": 365,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 10,
+                  "custo_unitario": 150,
+                  "total": 1500,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 5,
+                  "custo_unitario": 207,
+                  "total": 1035,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        },
+        {
+          "iteracao": 2,
+          "variaveis_decisao": {
+            "📱 Smartphone": 1,
+            "💻 Laptop": 16,
+            "🖥️ Desktop": 1
+          },
+          "receita_total": 6260,
+          "violacoes": [],
+          "custo_total": 2680.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1525,
+              "restante": 975,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 45,
+                  "total": 45,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 16,
+                  "custo_unitario": 85,
+                  "total": 1360,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 120,
+                  "total": 120,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1065,
+              "restante": 2435,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 25,
+                  "total": 25,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 16,
+                  "custo_unitario": 60,
+                  "total": 960,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 80,
+                  "total": 80,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 90,
+              "restante": 10,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 3,
+                  "total": 3,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 16,
+                  "custo_unitario": 5,
+                  "total": 80,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 7,
+                  "total": 7,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 2680.0,
+              "restante": 47320.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 73,
+                  "total": 73,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 16,
+                  "custo_unitario": 150,
+                  "total": 2400,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 1,
+                  "custo_unitario": 207,
+                  "total": 207,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        }
+      ],
+      "historico_recursos": {
+        "turnos": [],
+        "dinheiro": [],
+        "materia_prima": [],
+        "energia": [],
+        "trabalhadores": []
+      },
+      "historico_decisoes": [],
+      "producao_atual": {},
+      "restricoes_violadas": [],
+      "objetivo_atual": 0,
+      "equipes": {
+        "recursos": "Equipe Recursos C",
+        "producao": "Equipe Produção C",
+        "financas": "Equipe Finanças C"
+      },
+      "portal": {
+        "slug": "little-sock",
+        "senha": "DHMMY6C1"
+      }
+    },
+    "Pitch Guys": {
+      "recursos_disponiveis": {
+        "dinheiro": 50000,
+        "materia_prima": 2500,
+        "energia": 3500,
+        "trabalhadores": 100
+      },
+      "variaveis_decisao": {
+        "📱 Smartphone": 8,
+        "💻 Laptop": 4,
+        "🖥️ Desktop": 8
+      },
+      "historico_iteracoes": [
+        {
+          "iteracao": 1,
+          "variaveis_decisao": {
+            "📱 Smartphone": 5,
+            "💻 Laptop": 3,
+            "🖥️ Desktop": 6
+          },
+          "receita_total": 4830,
+          "violacoes": [],
+          "custo_total": 2057.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1200,
+              "restante": 1300,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 45,
+                  "total": 225,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 3,
+                  "custo_unitario": 85,
+                  "total": 255,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 6,
+                  "custo_unitario": 120,
+                  "total": 720,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 785,
+              "restante": 2715,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 25,
+                  "total": 125,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 3,
+                  "custo_unitario": 60,
+                  "total": 180,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 6,
+                  "custo_unitario": 80,
+                  "total": 480,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 72,
+              "restante": 28,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 3,
+                  "total": 15,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 3,
+                  "custo_unitario": 5,
+                  "total": 15,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 6,
+                  "custo_unitario": 7,
+                  "total": 42,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 2057.0,
+              "restante": 47943.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 5,
+                  "custo_unitario": 73,
+                  "total": 365,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 3,
+                  "custo_unitario": 150,
+                  "total": 450,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 6,
+                  "custo_unitario": 207,
+                  "total": 1242,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        },
+        {
+          "iteracao": 2,
+          "variaveis_decisao": {
+            "📱 Smartphone": 8,
+            "💻 Laptop": 4,
+            "🖥️ Desktop": 8
+          },
+          "receita_total": 6680,
+          "violacoes": [],
+          "custo_total": 2840.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1660,
+              "restante": 840,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 8,
+                  "custo_unitario": 45,
+                  "total": 360,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 4,
+                  "custo_unitario": 85,
+                  "total": 340,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 8,
+                  "custo_unitario": 120,
+                  "total": 960,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1080,
+              "restante": 2420,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 8,
+                  "custo_unitario": 25,
+                  "total": 200,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 4,
+                  "custo_unitario": 60,
+                  "total": 240,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 8,
+                  "custo_unitario": 80,
+                  "total": 640,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 100,
+              "restante": 0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 8,
+                  "custo_unitario": 3,
+                  "total": 24,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 4,
+                  "custo_unitario": 5,
+                  "total": 20,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 8,
+                  "custo_unitario": 7,
+                  "total": 56,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 2840.0,
+              "restante": 47160.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 8,
+                  "custo_unitario": 73,
+                  "total": 584,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 4,
+                  "custo_unitario": 150,
+                  "total": 600,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 8,
+                  "custo_unitario": 207,
+                  "total": 1656,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        }
+      ],
+      "historico_recursos": {
+        "turnos": [],
+        "dinheiro": [],
+        "materia_prima": [],
+        "energia": [],
+        "trabalhadores": []
+      },
+      "historico_decisoes": [],
+      "producao_atual": {},
+      "restricoes_violadas": [],
+      "objetivo_atual": 0,
+      "equipes": {
+        "recursos": "Equipe Recursos D",
+        "producao": "Equipe Produção D",
+        "financas": "Equipe Finanças D"
+      },
+      "portal": {
+        "slug": "pitch-guys",
+        "senha": "516F8KJS"
+      }
+    },
+    "Farmetes": {
+      "recursos_disponiveis": {
+        "dinheiro": 50000,
+        "materia_prima": 2500,
+        "energia": 3500,
+        "trabalhadores": 100
+      },
+      "variaveis_decisao": {
+        "📱 Smartphone": 0,
+        "💻 Laptop": 20,
+        "🖥️ Desktop": 0
+      },
+      "historico_iteracoes": [
+        {
+          "iteracao": 1,
+          "variaveis_decisao": {
+            "📱 Smartphone": 1,
+            "💻 Laptop": 2,
+            "🖥️ Desktop": 19
+          },
+          "receita_total": 10000,
+          "violacoes": [
+            "  ❌ Trabalhadores: Excesso de 46"
+          ],
+          "custo_total": 4306.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 2495,
+              "restante": 5,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 45,
+                  "total": 45,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 85,
+                  "total": 170,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 19,
+                  "custo_unitario": 120,
+                  "total": 2280,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1665,
+              "restante": 1835,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 25,
+                  "total": 25,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 60,
+                  "total": 120,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 19,
+                  "custo_unitario": 80,
+                  "total": 1520,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 146,
+              "restante": -46,
+              "violacao": true,
+              "faltante": 46,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 3,
+                  "total": 3,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 5,
+                  "total": 10,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 19,
+                  "custo_unitario": 7,
+                  "total": 133,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 4306.0,
+              "restante": 45694.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 1,
+                  "custo_unitario": 73,
+                  "total": 73,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 2,
+                  "custo_unitario": 150,
+                  "total": 300,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 19,
+                  "custo_unitario": 207,
+                  "total": 3933,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        },
+        {
+          "iteracao": 2,
+          "variaveis_decisao": {
+            "📱 Smartphone": 0,
+            "💻 Laptop": 20,
+            "🖥️ Desktop": 0
+          },
+          "receita_total": 7000,
+          "violacoes": [],
+          "custo_total": 3000.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1700,
+              "restante": 800,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 85,
+                  "total": 1700,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1200,
+              "restante": 2300,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 60,
+                  "total": 1200,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 100,
+              "restante": 0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 5,
+                  "total": 100,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 3000.0,
+              "restante": 47000.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 150,
+                  "total": 3000,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        }
+      ],
+      "historico_recursos": {
+        "turnos": [],
+        "dinheiro": [],
+        "materia_prima": [],
+        "energia": [],
+        "trabalhadores": []
+      },
+      "historico_decisoes": [],
+      "producao_atual": {},
+      "restricoes_violadas": [],
+      "objetivo_atual": 0,
+      "equipes": {
+        "recursos": "Equipe Recursos E",
+        "producao": "Equipe Produção E",
+        "financas": "Equipe Finanças E"
+      },
+      "portal": {
+        "slug": "farmetes",
+        "senha": "I1B80B5T"
+      }
+    },
+    "União": {
+      "recursos_disponiveis": {
+        "dinheiro": 50000,
+        "materia_prima": 2500,
+        "energia": 3500,
+        "trabalhadores": 100
+      },
+      "variaveis_decisao": {
+        "📱 Smartphone": 0,
+        "💻 Laptop": 20,
+        "🖥️ Desktop": 0
+      },
+      "historico_iteracoes": [
+        {
+          "iteracao": 1,
+          "variaveis_decisao": {
+            "📱 Smartphone": 10,
+            "💻 Laptop": 0,
+            "🖥️ Desktop": 10
+          },
+          "receita_total": 6600,
+          "violacoes": [],
+          "custo_total": 2800.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1650,
+              "restante": 850,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 10,
+                  "custo_unitario": 45,
+                  "total": 450,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 120,
+                  "total": 1200,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1050,
+              "restante": 2450,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 10,
+                  "custo_unitario": 25,
+                  "total": 250,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 80,
+                  "total": 800,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 100,
+              "restante": 0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 10,
+                  "custo_unitario": 3,
+                  "total": 30,
+                  "eh_dinheiro": false
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 7,
+                  "total": 70,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 2800.0,
+              "restante": 47200.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "📱 Smartphone",
+                  "quantidade": 10,
+                  "custo_unitario": 73,
+                  "total": 730,
+                  "eh_dinheiro": true
+                },
+                {
+                  "produto": "🖥️ Desktop",
+                  "quantidade": 10,
+                  "custo_unitario": 207,
+                  "total": 2070,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        },
+        {
+          "iteracao": 2,
+          "variaveis_decisao": {
+            "📱 Smartphone": 0,
+            "💻 Laptop": 20,
+            "🖥️ Desktop": 0
+          },
+          "receita_total": 7000,
+          "violacoes": [],
+          "custo_total": 3000.0,
+          "resumo_recursos": {
+            "materia_prima": {
+              "nome": "Materia Prima",
+              "emoji": "📦",
+              "disponivel": 2500,
+              "consumo": 1700,
+              "restante": 800,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 85,
+                  "total": 1700,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "energia": {
+              "nome": "Energia",
+              "emoji": "⚡",
+              "disponivel": 3500,
+              "consumo": 1200,
+              "restante": 2300,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 60,
+                  "total": 1200,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "trabalhadores": {
+              "nome": "Trabalhadores",
+              "emoji": "👥",
+              "disponivel": 100,
+              "consumo": 100,
+              "restante": 0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 5,
+                  "total": 100,
+                  "eh_dinheiro": false
+                }
+              ],
+              "eh_dinheiro": false
+            },
+            "dinheiro": {
+              "nome": "Dinheiro",
+              "emoji": "💰",
+              "disponivel": 50000,
+              "consumo": 3000.0,
+              "restante": 47000.0,
+              "violacao": false,
+              "faltante": 0,
+              "detalhes": [
+                {
+                  "produto": "💻 Laptop",
+                  "quantidade": 20,
+                  "custo_unitario": 150,
+                  "total": 3000,
+                  "eh_dinheiro": true
+                }
+              ],
+              "eh_dinheiro": true
+            }
+          }
+        }
+      ],
+      "historico_recursos": {
+        "turnos": [],
+        "dinheiro": [],
+        "materia_prima": [],
+        "energia": [],
+        "trabalhadores": []
+      },
+      "historico_decisoes": [],
+      "producao_atual": {},
+      "restricoes_violadas": [],
+      "objetivo_atual": 0,
+      "equipes": {
+        "recursos": "Equipe Recursos F",
+        "producao": "Equipe Produção F",
+        "financas": "Equipe Finanças F"
+      },
+      "portal": {
+        "slug": "união",
+        "senha": "6KFEBLBM"
+      }
+    }
+  },
+  "timestamp": "2025-09-30T11:56:45.971823"
+}

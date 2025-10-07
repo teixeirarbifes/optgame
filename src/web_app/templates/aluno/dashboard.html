@@ -1,0 +1,1424 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ empresa.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-white">
+                <i class="bi bi-building"></i> {{ empresa.nome }}
+            </h2>
+            <p class="text-white-50">
+                {% if empresa.equipe %}Equipe: {{ empresa.equipe }} | {% endif %}
+                Iteração <span id="numero-iteracao">{{ iteracao_atual }}</span>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Barra de Status do Jogo -->
+    <div class="row mb-3">
+        <div class="col">
+            <div id="status-jogo-card" class="card border-0 shadow-sm">
+                <div class="card-body py-2">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div id="status-icon" class="me-3" style="font-size: 2rem;">
+                                {% if iteracao_aberta %}🎯{% else %}⏰{% endif %}
+                            </div>
+                            <div>
+                                <h5 class="mb-0" id="status-titulo">
+                                    {% if iteracao_aberta %}
+                                        Aberta para Envio de Decisões
+                                    {% else %}
+                                        Aguardando Abertura de Nova Iteração
+                                    {% endif %}
+                                </h5>
+                                <small class="text-muted" id="status-descricao">
+                                    {% if iteracao_aberta %}
+                                        Você pode ajustar e enviar sua decisão de produção
+                                    {% else %}
+                                        Aguarde o professor abrir a próxima rodada
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <div id="status-badge">
+                            <span class="badge {% if iteracao_aberta %}bg-success{% else %}bg-secondary{% endif %} fs-6 px-3 py-2">
+                                {% if iteracao_aberta %}ENVIO LIBERADO{% else %}AGUARDANDO{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card bg-primary text-white">
+                <div class="stat-label">💰 Dinheiro
+                    {% if empresa.historico|length > 0 %}
+                    {% set ultimo_turno = empresa.historico[-1] %}
+                    {% set custo = ultimo_turno.custo %}
+                    {% if custo <= empresa.recursos_base.dinheiro %}
+                        <span class="recurso-status recurso-ok">✓</span>
+                    {% else %}
+                        <span class="recurso-status recurso-violacao">✗</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('dinheiro', 0) %}
+                {% set receita = ultimo_turno.receita %}
+                {% set custo = ultimo_turno.custo %}
+                {% set diferenca = empresa.recursos_base.dinheiro - custo %}
+                <div class="stat-value {% if diferenca < 0 %}text-danger{% endif %}" id="dinheiro-valor">
+                    {% if diferenca >= 0 %}R$ {% endif %}{% if diferenca % 1 == 0 %}{{ "%.0f"|format(diferenca) }}{% else %}{{ "%.2f"|format(diferenca) }}{% endif %}
+                </div>
+                <div class="stat-info" id="dinheiro-info">
+                    <small><strong>Capacidade:</strong> R$ {% if empresa.recursos_base.dinheiro % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.dinheiro) }}{% else %}{{ "%.2f"|format(empresa.recursos_base.dinheiro) }}{% endif %}</small><br>
+                    <small><strong>Uso:</strong> R$ {% if custo % 1 == 0 %}{{ "%.0f"|format(custo) }}{% else %}{{ "%.2f"|format(custo) }}{% endif %} | <strong>Lucro:</strong> R$ {% if ultimo_turno.lucro % 1 == 0 %}{{ "%.0f"|format(ultimo_turno.lucro) }}{% else %}{{ "%.2f"|format(ultimo_turno.lucro) }}{% endif %}</small>
+                </div>
+                {% else %}
+                <div class="stat-value" id="dinheiro-valor">R$ {% if empresa.recursos_base.dinheiro % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.dinheiro) }}{% else %}{{ "%.2f"|format(empresa.recursos_base.dinheiro) }}{% endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card bg-warning text-white">
+                <div class="stat-label">📦 Matéria-Prima
+                    {% if empresa.historico|length > 0 %}
+                    {% set ultimo_turno = empresa.historico[-1] %}
+                    {% set consumido = ultimo_turno.consumo.get('materia_prima', 0) %}
+                    {% if consumido <= empresa.recursos_base.materia_prima %}
+                        <span class="recurso-status recurso-ok">✓</span>
+                    {% else %}
+                        <span class="recurso-status recurso-violacao">✗</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('materia_prima', 0) %}
+                {% set diferenca = empresa.recursos_base.materia_prima - consumido %}
+                {% set percentual = (consumido / empresa.recursos_base.materia_prima * 100) if empresa.recursos_base.materia_prima > 0 else 0 %}
+                <div class="stat-value {% if diferenca < 0 %}text-danger{% endif %}" id="materia-valor">
+                    {% if diferenca % 1 == 0 %}{{ "%.0f"|format(diferenca) }}{% else %}{{ "%.1f"|format(diferenca) }}{% endif %}
+                </div>
+                <div class="stat-info" id="materia-info">
+                    <small><strong>Capacidade:</strong> {% if empresa.recursos_base.materia_prima % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.materia_prima) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.materia_prima) }}{% endif %}</small><br>
+                    <small><strong>Uso:</strong> {% if consumido % 1 == 0 %}{{ "%.0f"|format(consumido) }}{% else %}{{ "%.1f"|format(consumido) }}{% endif %} ({{ "%.0f"|format(percentual) }}%)</small>
+                </div>
+                {% else %}
+                <div class="stat-value" id="materia-valor">{% if empresa.recursos_base.materia_prima % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.materia_prima) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.materia_prima) }}{% endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card bg-info text-white">
+                <div class="stat-label">⚡ Energia
+                    {% if empresa.historico|length > 0 %}
+                    {% set ultimo_turno = empresa.historico[-1] %}
+                    {% set consumido = ultimo_turno.consumo.get('energia', 0) %}
+                    {% if consumido <= empresa.recursos_base.energia %}
+                        <span class="recurso-status recurso-ok">✓</span>
+                    {% else %}
+                        <span class="recurso-status recurso-violacao">✗</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('energia', 0) %}
+                {% set diferenca = empresa.recursos_base.energia - consumido %}
+                {% set percentual = (consumido / empresa.recursos_base.energia * 100) if empresa.recursos_base.energia > 0 else 0 %}
+                <div class="stat-value {% if diferenca < 0 %}text-danger{% endif %}" id="energia-valor">
+                    {% if diferenca % 1 == 0 %}{{ "%.0f"|format(diferenca) }}{% else %}{{ "%.1f"|format(diferenca) }}{% endif %}
+                </div>
+                <div class="stat-info" id="energia-info">
+                    <small><strong>Capacidade:</strong> {% if empresa.recursos_base.energia % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.energia) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.energia) }}{% endif %}</small><br>
+                    <small><strong>Uso:</strong> {% if consumido % 1 == 0 %}{{ "%.0f"|format(consumido) }}{% else %}{{ "%.1f"|format(consumido) }}{% endif %} ({{ "%.0f"|format(percentual) }}%)</small>
+                </div>
+                {% else %}
+                <div class="stat-value" id="energia-valor">{% if empresa.recursos_base.energia % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.energia) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.energia) }}{% endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card bg-success text-white">
+                <div class="stat-label">👥 Trabalhadores
+                    {% if empresa.historico|length > 0 %}
+                    {% set ultimo_turno = empresa.historico[-1] %}
+                    {% set consumido = ultimo_turno.consumo.get('trabalhadores', 0) %}
+                    {% if consumido <= empresa.recursos_base.trabalhadores %}
+                        <span class="recurso-status recurso-ok">✓</span>
+                    {% else %}
+                        <span class="recurso-status recurso-violacao">✗</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('trabalhadores', 0) %}
+                {% set diferenca = empresa.recursos_base.trabalhadores - consumido %}
+                <div class="stat-value {% if diferenca < 0 %}text-danger{% endif %}" id="trabalhadores-valor">
+                    {% if diferenca % 1 == 0 %}{{ "%.0f"|format(diferenca) }}{% else %}{{ "%.1f"|format(diferenca) }}{% endif %}
+                </div>
+                {% else %}
+                <div class="stat-value" id="trabalhadores-valor">{% if empresa.recursos_base.trabalhadores % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.trabalhadores) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.trabalhadores) }}{% endif %}</div>
+                {% endif %}
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('trabalhadores', 0) %}
+                {% set percentual = (consumido / empresa.recursos_base.trabalhadores * 100) if empresa.recursos_base.trabalhadores > 0 else 0 %}
+                <div class="stat-info" id="trabalhadores-info">
+                    <small><strong>Capacidade:</strong> {% if empresa.recursos_base.trabalhadores % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.trabalhadores) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.trabalhadores) }}{% endif %}</small><br>
+                    <small><strong>Uso:</strong> {% if consumido % 1 == 0 %}{{ "%.0f"|format(consumido) }}{% else %}{{ "%.1f"|format(consumido) }}{% endif %} ({{ "%.0f"|format(percentual) }}%)</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Lucro do Último Turno -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="text-muted mb-2">Lucro do Último Turno</h5>
+                    <h2 id="lucro-valor" class="{% if empresa.get('lucro_ultimo_turno', 0) > 0 %}text-success{% elif empresa.get('lucro_ultimo_turno', 0) < 0 %}text-danger{% else %}text-secondary{% endif %}">
+                        R$ {{ "%.2f"|format(empresa.get('lucro_ultimo_turno', 0)) }}
+                    </h2>
+                    {% if empresa.historico|length > 0 %}
+                    <small class="text-muted">
+                        Turno #{{ empresa.historico[-1].turno }} 
+                        {% if empresa.historico[-1].violacoes %}
+                        <span class="badge bg-danger">Violação</span>
+                        {% endif %}
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Formulário de Decisão -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-clipboard-check"></i> Decisão de Produção
+                </div>
+                <div class="card-body">
+                    {% if iteracao_aberta %}
+                    <form id="formDecisao">
+                        {% for produto, dados in produtos.items() %}
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <strong>{{ dados.emoji }} {{ produto }}</strong>
+                                <small class="text-muted d-block">
+                                    💵 Venda: R$ {{ "%.2f"|format(dados.preco_venda) }} | 
+                                     {{ dados.get('consumo_materia', dados.get('custo_materia', 0)) }} matéria 
+                                    ⚡ {{ dados.get('consumo_energia', dados.get('custo_energia', 0)) }} energia 
+                                    👥 {{ "%.1f"|format(dados.get('consumo_trabalhadores', dados.get('custo_trabalhadores', 0))) }} h-trab
+                                </small>
+                            </label>
+                            <div class="row align-items-center">
+                                <div class="col-8">
+                                    <input type="range" class="form-range produto-slider" 
+                                           id="slider_{{ loop.index }}" 
+                                           data-produto="{{ produto }}"
+                                           min="0" max="1000" value="{{ empresa.decisao_atual.get(produto, 0) }}" step="1">
+                                </div>
+                                <div class="col-4">
+                                    <input type="number" class="form-control produto-input" 
+                                           id="input_{{ loop.index }}"
+                                           name="produto_{{ produto }}"
+                                           data-produto="{{ produto }}"
+                                           min="0" max="10000" value="{{ empresa.decisao_atual.get(produto, 0) }}">
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                Recursos por unidade: 
+                                📦 {{ dados.custo_materia }} | 
+                                ⚡ {{ dados.custo_energia }} | 
+                                👥 {{ dados.custo_trabalhadores }}
+                            </small>
+                        </div>
+                        {% endfor %}
+                        
+                        <hr>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg btn-custom" id="btnEnviar">
+                                <i class="bi bi-send"></i> Enviar Decisão
+                            </button>
+                        </div>
+                        
+                        {% if empresa.decisao_confirmada %}
+                        <div class="alert alert-success mt-3">
+                            <i class="bi bi-check-circle"></i> Decisão confirmada! Aguarde o professor processar o turno.
+                        </div>
+                        {% endif %}
+                    </form>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-lock"></i> Iteração fechada. Aguarde o professor abrir a próxima iteração.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Análise em Tempo Real -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-graph-up"></i> Análise da Última Decisão
+                </div>
+                <div class="card-body">
+                    {% if empresa.decisao_confirmada %}
+                    <div class="alert alert-success mb-3">
+                        <i class="bi bi-check-circle"></i> <strong>Decisão enviada!</strong> Aguarde o professor processar o turno para ver os resultados.
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Análise de Violações do Último Turno -->
+                    {% if empresa.historico|length > 0 %}
+                        {% if empresa.historico[-1].violacoes %}
+                        <div class="alert alert-danger mb-4">
+                            <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> ⚠️ Decisão Inválida no Último Turno</h6>
+                            <p class="mb-2"><strong>Sua decisão foi registrada, mas NÃO FOI EXECUTADA</strong> porque ultrapassou os recursos disponíveis:</p>
+                            <ul class="mb-2">
+                            {% for violacao in empresa.historico[-1].violacoes %}
+                                <li>
+                                    {% if violacao.recurso == 'dinheiro' %}💰 <strong>Dinheiro</strong>
+                                    {% elif violacao.recurso == 'materia_prima' %}📦 <strong>Matéria-Prima</strong>
+                                    {% elif violacao.recurso == 'energia' %}⚡ <strong>Energia</strong>
+                                    {% elif violacao.recurso == 'trabalhadores' %}👥 <strong>Trabalhadores</strong>
+                                    {% endif %}
+                                    : Você tentou usar {{ "%.0f"|format(violacao.necessario) }}, 
+                                    mas tinha apenas {{ "%.0f"|format(violacao.disponivel) }}
+                                    <span class="text-danger fw-bold">(Faltaram {{ "%.0f"|format(violacao.deficit) }})</span>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                            <hr>
+                            <div class="bg-white p-2 rounded">
+                                <p class="mb-2"><strong>📊 O que aconteceu:</strong></p>
+                                <ul class="mb-2">
+                                    <li>✅ Sua decisão foi <strong>registrada</strong></li>
+                                    <li>❌ Nenhum recurso foi <strong>consumido</strong></li>
+                                    <li>❌ Nenhum lucro foi <strong>gerado</strong></li>
+                                    <li>⏭️ Você perdeu este turno</li>
+                                </ul>
+                            </div>
+                            <hr>
+                            <small class="mb-0">
+                                <strong>💡 Para a próxima iteração:</strong> Calcule cuidadosamente quanto cada produto consome de cada recurso. 
+                                Use a tabela de custos abaixo e verifique seus recursos disponíveis acima antes de decidir as quantidades.
+                            </small>
+                        </div>
+                        {% elif empresa.historico[-1].lucro <= 0 %}
+                        <div class="alert alert-warning mb-4">
+                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> 📉 Resultado Negativo</h6>
+                            <p class="mb-2">
+                                <strong>Sua decisão foi executada</strong>, mas gerou prejuízo ou lucro zero:
+                            </p>
+                            <ul class="mb-2">
+                                <li>✅ Recursos foram consumidos corretamente</li>
+                                <li>⚠️ Receita não cobriu os custos</li>
+                                <li>💸 Lucro: <strong class="text-danger">R$ {{ "%.2f"|format(empresa.historico[-1].lucro) }}</strong></li>
+                            </ul>
+                            <hr>
+                            <small>
+                                <strong>💡 Dica:</strong> Produza mais itens com maior margem de lucro (diferença entre preço de venda e custos).
+                                Verifique a tabela de produtos abaixo para identificá-los.
+                            </small>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-success mb-4">
+                            <h6 class="alert-heading"><i class="bi bi-check-circle"></i> ✅ Sucesso!</h6>
+                            <p class="mb-0">
+                                <strong>Parabéns!</strong> Sua decisão foi executada com sucesso:
+                            </p>
+                            <ul class="mb-0">
+                                <li>✅ Todos os recursos respeitados</li>
+                                <li>✅ Lucro gerado: <strong class="text-success">R$ {{ "%.2f"|format(empresa.historico[-1].lucro) }}</strong></li>
+                                <li>🎯 Continue otimizando para maximizar seus ganhos!</li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-lightbulb"></i> <strong>Primeiro turno:</strong> 
+                        Analise os custos de cada produto e seus recursos disponíveis antes de tomar sua primeira decisão.
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Métricas do Último Turno Processado -->
+                    {% if empresa.historico|length > 0 and not empresa.historico[-1].violacoes %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">Resultado do Último Turno</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="p-2 bg-light rounded">
+                                    <small class="text-muted d-block">Receita</small>
+                                    <strong class="text-success">R$ {{ "%.2f"|format(empresa.historico[-1].receita) }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-light rounded">
+                                    <small class="text-muted d-block">Custo</small>
+                                    <strong class="text-danger">R$ {{ "%.2f"|format(empresa.historico[-1].custo) }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-light rounded">
+                                    <small class="text-muted d-block">Lucro</small>
+                                    <strong class="{% if empresa.historico[-1].lucro > 0 %}text-success{% else %}text-danger{% endif %}">
+                                        R$ {{ "%.2f"|format(empresa.historico[-1].lucro) }}
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 bg-light rounded">
+                                    <small class="text-muted d-block">Margem</small>
+                                    <strong>{{ "%.1f"|format((empresa.historico[-1].lucro / empresa.historico[-1].receita * 100) if empresa.historico[-1].receita > 0 else 0) }}%</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Análise de Violações do Último Turno -->
+                    {% if empresa.historico[-1].violacoes %}
+                    <div class="alert alert-danger mb-4">
+                        <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Restrições Violadas no Último Turno</h6>
+                        <p class="mb-2">Sua decisão ultrapassou os recursos disponíveis:</p>
+                        <ul class="mb-2">
+                        {% for violacao in empresa.historico[-1].violacoes %}
+                            <li>
+                                {% if violacao.recurso == 'dinheiro' %}💰 <strong>Dinheiro</strong>
+                                {% elif violacao.recurso == 'materia_prima' %}📦 <strong>Matéria-Prima</strong>
+                                {% elif violacao.recurso == 'energia' %}⚡ <strong>Energia</strong>
+                                {% elif violacao.recurso == 'trabalhadores' %}👥 <strong>Trabalhadores</strong>
+                                {% endif %}
+                                : Necessário {{ "%.0f"|format(violacao.necessario) }}, 
+                                Disponível {{ "%.0f"|format(violacao.disponivel) }}
+                                <span class="text-danger fw-bold">(Faltaram {{ "%.0f"|format(violacao.deficit) }})</span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                        <hr>
+                        <small class="mb-0">
+                            <strong>💡 Dica:</strong> Revise sua decisão para a próxima iteração. 
+                            Reduza a produção dos itens que mais consomem os recursos em falta, 
+                            ou ajuste o mix de produtos para equilibrar o uso de recursos.
+                        </small>
+                    </div>
+                    {% elif empresa.historico[-1].lucro < 0 %}
+                    <div class="alert alert-warning mb-4">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Análise do Resultado</h6>
+                        <p class="mb-0">
+                            <strong>Prejuízo detectado.</strong> Embora você tenha respeitado todas as restrições de recursos,
+                            os custos de produção superaram a receita. Considere:
+                        </p>
+                        <ul class="mb-0 mt-2">
+                            <li>Aumentar produção de itens com maior margem de lucro</li>
+                            <li>Reduzir produção de itens com baixa margem</li>
+                            <li>Utilizar melhor os recursos disponíveis</li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success mb-4">
+                        <i class="bi bi-check-circle"></i> <strong>Parabéns!</strong> 
+                        Sua última decisão respeitou todas as restrições e gerou lucro positivo. 
+                        Continue otimizando para maximizar seus ganhos!
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    
+                    <!-- Consumo de Recursos (Último Turno) -->
+                    {% if empresa.historico|length > 0 %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">Consumo de Recursos (Último Turno)</h6>
+                        {% set ultimo_turno = empresa.historico[-1] %}
+                        {% set ultimo_consumo = ultimo_turno.consumo %}
+                        
+                        {%if ultimo_turno.violacoes %}
+                        <div class="alert alert-danger mb-3">
+                            <strong>⚠️ TURNO NÃO EXECUTADO - Recursos Insuficientes!</strong>
+                        </div>
+                        {% endif %}
+                        
+                        {% for recurso in ['dinheiro', 'materia_prima', 'energia', 'trabalhadores'] %}
+                        <div class="mb-3">
+                            {% set capacidade = empresa.recursos_base.get(recurso, 0) %}
+                            {% set uso = ultimo_consumo.get(recurso, 0) %}
+                            {% set restante = capacidade - uso %}
+                            
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="fw-bold">
+                                    {% if recurso == 'dinheiro' %}💰 Dinheiro
+                                    {% elif recurso == 'materia_prima' %}📦 Matéria-Prima
+                                    {% elif recurso == 'energia' %}⚡ Energia
+                                    {% elif recurso == 'trabalhadores' %}👥 Trabalhadores
+                                    {% endif %}
+                                </small>
+                                <small>
+                                    Uso: <strong>{% if uso % 1 == 0 %}{{ "%.0f"|format(uso) }}{% else %}{{ "%.1f"|format(uso) }}{% endif %}</strong> / 
+                                    Capacidade: <strong>{% if capacidade % 1 == 0 %}{{ "%.0f"|format(capacidade) }}{% else %}{{ "%.1f"|format(capacidade) }}{% endif %}</strong>
+                                    {% set percentual = (uso / capacidade * 100) if capacidade > 0 else 0 %}
+                                    {% if percentual > 100 %}
+                                    <span class="badge bg-danger ms-1">VIOLAÇÃO!</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            {% set percentual_barra = (uso / capacidade * 100) if capacidade > 0 else 0 %}
+                            <div class="progress">
+                                <div class="progress-bar {% if percentual_barra > 100 %}bg-danger{% elif percentual_barra > 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                                     style="width: {{ [percentual_barra, 100]|min }}%">
+                                </div>
+                            </div>
+                            <small class="text-muted">Restante: {% if restante % 1 == 0 %}{{ "%.0f"|format(restante) }}{% else %}{{ "%.1f"|format(restante) }}{% endif %}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Tabela de Custos Unitários dos Recursos -->
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">⚠️ Custos Unitários dos Recursos (Constantes)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-warning">
+                                    <tr>
+                                        <th>Recurso</th>
+                                        <th class="text-end">Custo Unitário</th>
+                                        <th class="text-center">Unidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>📦 Matéria-Prima</td>
+                                        <td class="text-end fw-bold">R$ 1,50</td>
+                                        <td class="text-center">por unidade</td>
+                                    </tr>
+                                    <tr>
+                                        <td>⚡ Energia</td>
+                                        <td class="text-end fw-bold">R$ 0,80</td>
+                                        <td class="text-center">por kWh</td>
+                                    </tr>
+                                    <tr>
+                                        <td>👥 Trabalhadores</td>
+                                        <td class="text-end fw-bold">R$ 25,00</td>
+                                        <td class="text-center">por hora-trab</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="alert alert-info mb-0">
+                            <small><i class="bi bi-calculator"></i> <strong>Calcule você mesmo:</strong> Custo Total = (Consumo Matéria × R$1,50) + (Consumo Energia × R$0,80) + (Consumo Trab × R$25,00)</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabela de Produtos -->
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Informações dos Produtos (Consumo por Unidade)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th class="text-end">Preço</th>
+                                        <th class="text-center">📦</th>
+                                        <th class="text-center">⚡</th>
+                                        <th class="text-center">👥</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for produto, dados in produtos.items() %}
+                                    <tr>
+                                        <td>{{ dados.emoji }} {{ produto }}</td>
+                                        <td class="text-end text-success fw-bold">R$ {{ "%.2f"|format(dados.preco_venda) }}</td>
+                                        <td class="text-center">{{ dados.get('consumo_materia', dados.get('custo_materia', 0)) }}</td>
+                                        <td class="text-center">{{ dados.get('consumo_energia', dados.get('custo_energia', 0)) }}</td>
+                                        <td class="text-center">{{ "%.1f"|format(dados.get('consumo_trabalhadores', dados.get('custo_trabalhadores', 0))) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Histórico Detalhado de Decisões -->
+    {% if empresa.historico|length > 0 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-table"></i> Histórico Completo de Decisões e Consumos
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Turno</th>
+                                    <th>Decisão</th>
+                                    <th class="text-end">Receita</th>
+                                    <th class="text-end">Custo</th>
+                                    <th class="text-end">Lucro</th>
+                                    <th class="text-center">Consumo</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hist in empresa.historico %}
+                                <tr class="{% if hist.violacoes %}table-danger{% elif hist.lucro > 0 %}table-success{% else %}table-warning{% endif %}">
+                                    <td><strong>#{{ hist.turno }}</strong></td>
+                                    <td>
+                                        <small>
+                                        {% for prod, qtd in hist.decisao.items() %}
+                                            {% if qtd > 0 %}
+                                            <span class="badge bg-secondary">{{ produtos[prod].emoji }} {{ prod }}: {{ qtd }}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </small>
+                                    </td>
+                                    <td class="text-end"><small class="text-success">R$ {{ "%.2f"|format(hist.receita) }}</small></td>
+                                    <td class="text-end"><small class="text-danger">R$ {{ "%.2f"|format(hist.custo) }}</small></td>
+                                    <td class="text-end">
+                                        <strong class="{% if hist.lucro > 0 %}text-success{% else %}text-danger{% endif %}">
+                                            R$ {{ "%.2f"|format(hist.lucro) }}
+                                        </strong>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-info" type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#detalhes-{{ hist.turno }}"
+                                                aria-expanded="false">
+                                            <i class="bi bi-eye"></i> Ver Detalhes
+                                        </button>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if hist.violacoes %}
+                                        <span class="badge bg-danger" data-bs-toggle="tooltip" title="{% for v in hist.violacoes %}{{ v.recurso }}: faltaram {{ v.deficit }}{% if not loop.last %}, {% endif %}{% endfor %}">
+                                            <i class="bi bi-exclamation-triangle"></i> Violação
+                                        </span>
+                                        {% elif hist.lucro > 0 %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> OK</span>
+                                        {% else %}
+                                        <span class="badge bg-warning"><i class="bi bi-dash-circle"></i> Prejuízo</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="detalhes-{{ hist.turno }}">
+                                    <td colspan="7" class="bg-light">
+                                        <div class="p-3">
+                                            <h6 class="mb-3">📊 Detalhamento de Consumo e Custos - Turno #{{ hist.turno }}</h6>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6 class="text-muted">Consumo de Recursos</h6>
+                                                    <table class="table table-sm table-bordered">
+                                                        <thead class="table-secondary">
+                                                            <tr>
+                                                                <th>Recurso</th>
+                                                                <th class="text-center">Consumo</th>
+                                                                <th class="text-end">Custo Unit.</th>
+                                                                <th class="text-end">Custo Total</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>📦 Matéria-Prima</td>
+                                                                <td class="text-center">{{ "%.0f"|format(hist.consumo.materia_prima) }} un</td>
+                                                                <td class="text-end">R$ 1,50</td>
+                                                                <td class="text-end fw-bold">R$ {{ "%.2f"|format(hist.consumo.materia_prima * 1.50) }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>⚡ Energia</td>
+                                                                <td class="text-center">{{ "%.0f"|format(hist.consumo.energia) }} kWh</td>
+                                                                <td class="text-end">R$ 0,80</td>
+                                                                <td class="text-end fw-bold">R$ {{ "%.2f"|format(hist.consumo.energia * 0.80) }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>👥 Trabalhadores</td>
+                                                                <td class="text-center">{{ "%.1f"|format(hist.consumo.trabalhadores) }} h-trab</td>
+                                                                <td class="text-end">R$ 25,00</td>
+                                                                <td class="text-end fw-bold">R$ {{ "%.2f"|format(hist.consumo.trabalhadores * 25.00) }}</td>
+                                                            </tr>
+                                                            <tr class="table-info">
+                                                                <td colspan="3" class="text-end"><strong>CUSTO TOTAL:</strong></td>
+                                                                <td class="text-end"><strong>R$ {{ "%.2f"|format(hist.custo) }}</strong></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    <h6 class="text-muted">Análise Financeira</h6>
+                                                    <table class="table table-sm table-bordered">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>💵 Receita Total</td>
+                                                                <td class="text-end text-success fw-bold">R$ {{ "%.2f"|format(hist.receita) }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>💸 Custo Total</td>
+                                                                <td class="text-end text-danger fw-bold">R$ {{ "%.2f"|format(hist.custo) }}</td>
+                                                            </tr>
+                                                            <tr class="table-{% if hist.lucro > 0 %}success{% else %}danger{% endif %}">
+                                                                <td><strong>💰 Lucro</strong></td>
+                                                                <td class="text-end"><strong>R$ {{ "%.2f"|format(hist.lucro) }}</strong></td>
+                                                            </tr>
+                                                            {% if hist.receita > 0 %}
+                                                            <tr>
+                                                                <td>📊 Margem (%)</td>
+                                                                <td class="text-end">{{ "%.1f"|format((hist.lucro / hist.receita) * 100) }}%</td>
+                                                            </tr>
+                                                            {% endif %}
+                                                        </tbody>
+                                                    </table>
+                                                    
+                                                    {% if hist.violacoes %}
+                                                    <div class="alert alert-danger mb-0 mt-2">
+                                                        <strong>⚠️ Violações Detectadas:</strong>
+                                                        <ul class="mb-0 mt-1">
+                                                            {% for v in hist.violacoes %}
+                                                            <li>{{ v.recurso }}: faltaram {{ "%.1f"|format(v.deficit) }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Histórico e Gráficos -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-clock-history"></i> Resumo por Turno
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Turno</th>
+                                    <th class="text-end">Lucro</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hist in empresa.historico %}
+                                <tr>
+                                    <td><strong>Turno #{{ hist.turno }}</strong></td>
+                                    <td class="text-end">
+                                        <span class="badge {% if hist.lucro > 0 %}bg-success{% elif hist.lucro < 0 %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            R$ {{ "%.2f"|format(hist.lucro) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if hist.violacoes %}
+                                        <i class="bi bi-x-circle text-danger" title="Violação"></i>
+                                        {% else %}
+                                        <i class="bi bi-check-circle text-success" title="Executado"></i>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Nenhum turno jogado ainda</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-bar-chart-line"></i> Evolução de Recursos</span>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="tipoGrafico" id="graficoTodos" value="todos" checked autocomplete="off">
+                        <label class="btn btn-outline-primary" for="graficoTodos">
+                            <i class="bi bi-grid-3x2"></i> Todos
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="tipoGrafico" id="graficoDinheiro" value="dinheiro" autocomplete="off">
+                        <label class="btn btn-outline-success" for="graficoDinheiro">
+                            💰
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="tipoGrafico" id="graficoMateria" value="materia" autocomplete="off">
+                        <label class="btn btn-outline-warning" for="graficoMateria">
+                            📦
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="tipoGrafico" id="graficoEnergia" value="energia" autocomplete="off">
+                        <label class="btn btn-outline-info" for="graficoEnergia">
+                            ⚡
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="tipoGrafico" id="graficoTrabalhadores" value="trabalhadores" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="graficoTrabalhadores">
+                            👥
+                        </label>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height: 350px;">
+                        <canvas id="chartRecursos"></canvas>
+                    </div>
+                    <div id="infoGrafico" class="mt-3 text-center" style="display: none;">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i> 
+                            <span id="infoTexto"></span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Verificar session_id do sessionStorage
+    (function() {
+        let sessionId = sessionStorage.getItem('optgame_session_id');
+        
+        // Se session_id não existe mas há session no servidor (admin acessando como empresa)
+        const sessionDoServidor = '{{ session.get("session_id", "") }}';
+        if (!sessionId && sessionDoServidor) {
+            // Admin está acessando como empresa - usar session_id do servidor
+            sessionId = sessionDoServidor;
+            sessionStorage.setItem('optgame_session_id', sessionId);
+        }
+        
+        if (!sessionId) {
+            // Não há session_id válido - redirecionar para login
+            window.location.href = '{{ url_for("aluno.login") }}';
+            return;
+        }
+
+        // Adicionar cabeçalho com session_id em todas as requisições AJAX
+        $(document).ajaxSend(function(event, xhr) {
+            xhr.setRequestHeader('X-Session-Id', sessionId);
+        });
+    })();
+    
+    // Sincronia entre sliders e inputs
+    $('.produto-slider').on('input', function() {
+        const produto = $(this).data('produto');
+        const valor = $(this).val();
+        $(`input[data-produto="${produto}"]`).val(valor);
+    });
+    
+    $('.produto-input').on('input', function() {
+        const produto = $(this).data('produto');
+        const valor = $(this).val();
+        $(`#slider_${$(this).attr('id').split('_')[1]}`).val(valor);
+    });
+    
+    // Enviar decisão via AJAX com CSRF
+    $('#formDecisao').on('submit', function(e) {
+        e.preventDefault();
+        
+        if (!confirm('Confirmar envio da decisão? Você não poderá alterá-la depois.')) {
+            return;
+        }
+        
+        // Coletar dados do formulário e converter para formato correto
+        const decisoes = {};
+        $(this).serializeArray().forEach(item => {
+            // Remove o prefixo "produto_" e converte para inteiro
+            if (item.name.startsWith('produto_')) {
+                const produto = item.name.replace('produto_', '');
+                decisoes[produto] = parseInt(item.value) || 0;
+            }
+        });
+        
+        showLoading();
+        $.ajax({
+            url: '{{ url_for("aluno.enviar_decisao") }}',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ decisoes: decisoes }),
+            success: function(response) {
+                hideLoading();
+                if (response.sucesso) {
+                    showToast('Decisão enviada com sucesso!', 'success');
+                    // Atualizar estado sem reload
+                    atualizarEstadoJogo();
+                } else {
+                    showToast(response.mensagem || 'Erro ao enviar decisão', 'danger');
+                }
+            },
+            error: function(xhr) {
+                hideLoading();
+                const response = xhr.responseJSON;
+                const message = response?.mensagem || 'Erro ao enviar decisão';
+                showToast(message, 'danger');
+            }
+        });
+    });
+    
+    // Dados dos recursos (histórico)
+    const dadosRecursos = {
+        turnos: {{ empresa.historico_recursos.turnos|tojson }},
+        dinheiro: {{ empresa.historico_recursos.dinheiro|tojson }},
+        materia_prima: {{ empresa.historico_recursos.materia_prima|tojson }},
+        energia: {{ empresa.historico_recursos.energia|tojson }},
+        trabalhadores: {{ empresa.historico_recursos.trabalhadores|tojson }}
+    };
+    
+    // Histórico de custos (para calcular consumo de dinheiro corretamente)
+    const historicoCustos = {{ empresa.historico|tojson }};
+    
+    // Recursos base (capacidade máxima)
+    const recursos_base = {
+        dinheiro: {{ empresa.recursos_base.dinheiro }},
+        materia_prima: {{ empresa.recursos_base.materia_prima }},
+        energia: {{ empresa.recursos_base.energia }},
+        trabalhadores: {{ empresa.recursos_base.trabalhadores }}
+    };
+    
+    // Calcular consumo
+    // Para dinheiro: usar CUSTO direto do histórico (não base - disponível)
+    // Para outros recursos: base - disponível
+    const dadosConsumo = {
+        turnos: dadosRecursos.turnos,
+        dinheiro: historicoCustos.map(h => h.custo || 0),  // CUSTO POSITIVO
+        materia_prima: dadosRecursos.materia_prima.map(m => recursos_base.materia_prima - m),
+        energia: dadosRecursos.energia.map(e => recursos_base.energia - e),
+        trabalhadores: dadosRecursos.trabalhadores.map(t => recursos_base.trabalhadores - t)
+    };
+    
+    // Se houver apenas 1 registro, duplicar para formar área visível
+    if (dadosConsumo.turnos.length === 1) {
+        dadosConsumo.turnos = [dadosConsumo.turnos[0], dadosConsumo.turnos[0]];
+        dadosConsumo.dinheiro = [dadosConsumo.dinheiro[0], dadosConsumo.dinheiro[0]];
+        dadosConsumo.materia_prima = [dadosConsumo.materia_prima[0], dadosConsumo.materia_prima[0]];
+        dadosConsumo.energia = [dadosConsumo.energia[0], dadosConsumo.energia[0]];
+        dadosConsumo.trabalhadores = [dadosConsumo.trabalhadores[0], dadosConsumo.trabalhadores[0]];
+    }
+    
+    // Valores de limite superior (recursos_base)
+    const limitesSuperior = {
+        dinheiro: recursos_base.dinheiro,
+        materia: recursos_base.materia_prima,
+        energia: recursos_base.energia,
+        trabalhadores: recursos_base.trabalhadores
+    };
+    
+    // Configurações de cores e labels
+    const configRecursos = {
+        dinheiro: {
+            label: '💰 Dinheiro',
+            borderColor: '#28a745',
+            backgroundColor: '#28a74533',
+            metaLabel: 'Meta/Inicial: R$ 50.000',
+            formato: (val) => 'R$ ' + val.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})
+        },
+        materia: {
+            label: '📦 Matéria-Prima',
+            borderColor: '#e67e22',
+            backgroundColor: '#e67e2233',
+            metaLabel: 'Meta/Inicial: 25.000 un',
+            formato: (val) => val.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 1}) + ' un'
+        },
+        energia: {
+            label: '⚡ Energia',
+            borderColor: '#f39c12',
+            backgroundColor: '#f39c1233',
+            metaLabel: 'Meta/Inicial: 18.000 kWh',
+            formato: (val) => val.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 1}) + ' kWh'
+        },
+        trabalhadores: {
+            label: '👥 Trabalhadores',
+            borderColor: '#9b59b6',
+            backgroundColor: '#9b59b633',
+            metaLabel: 'Meta/Inicial: 800 h-trab',
+            formato: (val) => val.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 1}) + ' h'
+        }
+    };
+    
+    // Criar gráfico inicial
+    let chartRecursos = new Chart(document.getElementById('chartRecursos'), {
+        type: 'line',
+        data: getChartData('todos'),
+        options: getChartOptions('todos')
+    });
+    
+    // Função para obter dados do gráfico conforme o tipo
+    function getChartData(tipo) {
+        if (tipo === 'todos') {
+            return {
+                labels: dadosConsumo.turnos,
+                datasets: [
+                    {
+                        label: '💰 Consumo Dinheiro',
+                        data: dadosConsumo.dinheiro,
+                        borderColor: configRecursos.dinheiro.borderColor,
+                        backgroundColor: configRecursos.dinheiro.backgroundColor,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '📦 Consumo Matéria-Prima',
+                        data: dadosConsumo.materia_prima,
+                        borderColor: configRecursos.materia.borderColor,
+                        backgroundColor: configRecursos.materia.backgroundColor,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '⚡ Consumo Energia',
+                        data: dadosConsumo.energia,
+                        borderColor: configRecursos.energia.borderColor,
+                        backgroundColor: configRecursos.energia.backgroundColor,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '👥 Consumo Trabalhadores',
+                        data: dadosConsumo.trabalhadores,
+                        borderColor: configRecursos.trabalhadores.borderColor,
+                        backgroundColor: configRecursos.trabalhadores.backgroundColor,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y'
+                    }
+                ]
+            };
+        } else {
+            // Gráfico individual com CONSUMO e LIMITE SUPERIOR
+            const config = configRecursos[tipo];
+            const dataKey = tipo === 'materia' ? 'materia_prima' : tipo;
+            const limiteSuperior = limitesSuperior[tipo];
+            
+            return {
+                labels: dadosConsumo.turnos,
+                datasets: [
+                    {
+                        label: '🔴 Limite Superior (Capacidade)',
+                        data: Array(dadosConsumo.turnos.length).fill(limiteSuperior),
+                        borderColor: '#dc3545',
+                        backgroundColor: '#dc354520',
+                        borderDash: [10, 5],
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        fill: true,
+                        order: 2
+                    },
+                    {
+                        label: 'Consumo ' + config.label,
+                        data: dadosConsumo[dataKey],
+                        borderColor: config.borderColor,
+                        backgroundColor: config.backgroundColor,
+                        tension: 0.3,
+                        fill: true,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        order: 1
+                    }
+                ]
+            };
+        }
+    }
+    
+    // Função para obter opções do gráfico
+    function getChartOptions(tipo) {
+        const config = tipo !== 'todos' ? configRecursos[tipo] : null;
+        
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 11
+                        },
+                        padding: 10
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (tipo !== 'todos' && config) {
+                                label += config.formato(context.parsed.y);
+                            } else {
+                                label += context.parsed.y.toLocaleString('pt-BR');
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: tipo !== 'todos' && config ? limitesSuperior[tipo] * 1.1 : undefined,
+                    ticks: {
+                        callback: function(value) {
+                            if (tipo !== 'todos' && config) {
+                                return config.formato(value);
+                            }
+                            return value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            }
+        };
+    }
+    
+    // Atualizar gráfico quando o tipo mudar
+    $('input[name="tipoGrafico"]').on('change', function() {
+        const tipo = $(this).val();
+        
+        // Atualizar dados e opções do gráfico
+        chartRecursos.data = getChartData(tipo);
+        chartRecursos.options = getChartOptions(tipo);
+        chartRecursos.update();
+        
+        // Mostrar/ocultar informações
+        if (tipo !== 'todos') {
+            const config = configRecursos[tipo];
+            const limiteSuperior = limitesSuperior[tipo];
+            $('#infoTexto').html(
+                `A <strong>área vermelha</strong> mostra o limite superior (${config.formato(limiteSuperior)}). ` +
+                `O consumo deve ficar <strong>abaixo</strong> deste limite para não violar as restrições!`
+            );
+            $('#infoGrafico').show();
+        } else {
+            $('#infoGrafico').hide();
+        }
+    });
+
+    // AJAX: Atualização automática do estado do jogo
+    let ultimaIteracao = {{ iteracao_atual }};
+    let iteracaoAberta = {{ 'true' if iteracao_aberta else 'false' }};
+    let processandoTurno = false;
+    
+    // Função para formatar números (mostra decimal apenas se necessário)
+    function formatarNumero(valor, casasDecimais) {
+        if (valor % 1 === 0) {
+            // É inteiro
+            return valor.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        } else {
+            // Tem decimal
+            return valor.toLocaleString('pt-BR', {minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais});
+        }
+    }
+    
+    function atualizarEstadoJogo() {
+        $.ajax({
+            url: '/aluno/api/estado',
+            method: 'GET',
+            success: function(data) {
+                // Atualizar número da iteração
+                $('#numero-iteracao').text(data.iteracao_atual);
+                
+                // Atualizar informações adicionais dos cards (capacidade e uso)
+                if (data.historico && data.historico.length > 0) {
+                    const ultimoTurno = data.historico[data.historico.length - 1];
+                    const consumo = ultimoTurno.consumo;
+                    const lucro = ultimoTurno.lucro || 0;
+                    const custo = ultimoTurno.custo || 0;
+                    
+                    // Dinheiro (mostra diferença: capacidade - custo)
+                    const dinheiroDiferenca = data.recursos_base.dinheiro - custo;
+                    const dinheiroViolado = custo > data.recursos_base.dinheiro;
+                    const dinheiroIndicador = dinheiroViolado 
+                        ? '<span class="recurso-status recurso-violacao">✗</span>' 
+                        : '<span class="recurso-status recurso-ok">✓</span>';
+                    $('.stat-label:contains("💰 Dinheiro")').html('💰 DINHEIRO ' + dinheiroIndicador);
+                    
+                    const dinheiroValor = $('#dinheiro-valor');
+                    if (dinheiroViolado) {
+                        dinheiroValor.addClass('text-danger').removeClass('text-white');
+                        dinheiroValor.text((dinheiroDiferenca >= 0 ? 'R$ ' : '') + formatarNumero(dinheiroDiferenca, 2));
+                    } else {
+                        dinheiroValor.removeClass('text-danger').addClass('text-white');
+                        dinheiroValor.text('R$ ' + formatarNumero(dinheiroDiferenca, 2));
+                    }
+                    
+                    $('#dinheiro-info').html(
+                        '<small><strong>Capacidade:</strong> R$ ' + formatarNumero(data.recursos_base.dinheiro, 2) + '</small><br>' +
+                        '<small><strong>Uso:</strong> R$ ' + formatarNumero(custo, 2) + ' | <strong>Lucro:</strong> R$ ' + formatarNumero(lucro, 2) + '</small>'
+                    );
+                    
+                    // Matéria-Prima (mostra diferença: capacidade - consumo)
+                    const materiaConsumida = consumo.materia_prima || 0;
+                    const materiaDiferenca = data.recursos_base.materia_prima - materiaConsumida;
+                    const materiaPercent = (materiaConsumida / data.recursos_base.materia_prima * 100).toFixed(0);
+                    const materiaViolada = materiaConsumida > data.recursos_base.materia_prima;
+                    const materiaIndicador = materiaViolada 
+                        ? '<span class="recurso-status recurso-violacao">✗</span>' 
+                        : '<span class="recurso-status recurso-ok">✓</span>';
+                    $('.stat-label:contains("📦 Matéria-Prima")').html('📦 MATÉRIA-PRIMA ' + materiaIndicador);
+                    
+                    const materiaValor = $('#materia-valor');
+                    if (materiaViolada) {
+                        materiaValor.addClass('text-danger').removeClass('text-white');
+                    } else {
+                        materiaValor.removeClass('text-danger').addClass('text-white');
+                    }
+                    materiaValor.text(formatarNumero(materiaDiferenca, 1));
+                    
+                    $('#materia-info').html(
+                        '<small><strong>Capacidade:</strong> ' + formatarNumero(data.recursos_base.materia_prima, 1) + '</small><br>' +
+                        '<small><strong>Uso:</strong> ' + formatarNumero(materiaConsumida, 1) + ' (' + materiaPercent + '%)</small>'
+                    );
+                    
+                    // Energia (mostra diferença: capacidade - consumo)
+                    const energiaConsumida = consumo.energia || 0;
+                    const energiaDiferenca = data.recursos_base.energia - energiaConsumida;
+                    const energiaPercent = (energiaConsumida / data.recursos_base.energia * 100).toFixed(0);
+                    const energiaViolada = energiaConsumida > data.recursos_base.energia;
+                    const energiaIndicador = energiaViolada 
+                        ? '<span class="recurso-status recurso-violacao">✗</span>' 
+                        : '<span class="recurso-status recurso-ok">✓</span>';
+                    $('.stat-label:contains("⚡ Energia")').html('⚡ ENERGIA ' + energiaIndicador);
+                    
+                    const energiaValor = $('#energia-valor');
+                    if (energiaViolada) {
+                        energiaValor.addClass('text-danger').removeClass('text-white');
+                    } else {
+                        energiaValor.removeClass('text-danger').addClass('text-white');
+                    }
+                    energiaValor.text(formatarNumero(energiaDiferenca, 1));
+                    
+                    $('#energia-info').html(
+                        '<small><strong>Capacidade:</strong> ' + formatarNumero(data.recursos_base.energia, 1) + '</small><br>' +
+                        '<small><strong>Uso:</strong> ' + formatarNumero(energiaConsumida, 1) + ' (' + energiaPercent + '%)</small>'
+                    );
+                    
+                    // Trabalhadores (mostra diferença: capacidade - consumo)
+                    const trabalhadoresConsumidos = consumo.trabalhadores || 0;
+                    const trabalhadoresDiferenca = data.recursos_base.trabalhadores - trabalhadoresConsumidos;
+                    const trabalhadoresPercent = (trabalhadoresConsumidos / data.recursos_base.trabalhadores * 100).toFixed(0);
+                    const trabalhadoresViolados = trabalhadoresConsumidos > data.recursos_base.trabalhadores;
+                    const trabalhadoresIndicador = trabalhadoresViolados 
+                        ? '<span class="recurso-status recurso-violacao">✗</span>' 
+                        : '<span class="recurso-status recurso-ok">✓</span>';
+                    $('.stat-label:contains("👥 Trabalhadores")').html('👥 TRABALHADORES ' + trabalhadoresIndicador);
+                    
+                    const trabalhadoresValor = $('#trabalhadores-valor');
+                    if (trabalhadoresViolados) {
+                        trabalhadoresValor.addClass('text-danger').removeClass('text-white');
+                    } else {
+                        trabalhadoresValor.removeClass('text-danger').addClass('text-white');
+                    }
+                    trabalhadoresValor.text(formatarNumero(trabalhadoresDiferenca, 1));
+                    
+                    $('#trabalhadores-info').html(
+                        '<small><strong>Capacidade:</strong> ' + formatarNumero(data.recursos_base.trabalhadores, 1) + '</small><br>' +
+                        '<small><strong>Uso:</strong> ' + formatarNumero(trabalhadoresConsumidos, 1) + ' (' + trabalhadoresPercent + '%)</small>'
+                    );
+                } else {
+                    // Sem histórico: mostrar capacidade total
+                    $('#dinheiro-valor').removeClass('text-danger').addClass('text-white').text('R$ ' + formatarNumero(data.recursos_base.dinheiro, 2));
+                    $('#materia-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.materia_prima, 1));
+                    $('#energia-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.energia, 1));
+                    $('#trabalhadores-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.trabalhadores, 1));
+                }
+                
+                // Atualizar lucro último turno
+                if (data.lucro_ultimo_turno !== null) {
+                    $('#lucro-valor').text('R$ ' + data.lucro_ultimo_turno.toLocaleString('pt-BR', {minimumFractionDigits: 2}));
+                    $('#lucro-valor').removeClass('text-success text-danger text-secondary');
+                    $('#lucro-valor').addClass(data.lucro_ultimo_turno > 0 ? 'text-success' : (data.lucro_ultimo_turno < 0 ? 'text-danger' : 'text-secondary'));
+                }
+                
+                // Atualizar sliders se houver decisões não confirmadas (enviadas pelo admin via "Enviar Ótimo")
+                if (data.decisoes_nao_confirmadas && Object.keys(data.decisoes_nao_confirmadas).length > 0 && !data.decisao_confirmada) {
+                    console.log('Atualizando sliders com decisões pendentes:', data.decisoes_nao_confirmadas);
+                    
+                    // Atualizar cada produto
+                    Object.keys(data.decisoes_nao_confirmadas).forEach(function(produto) {
+                        const quantidade = data.decisoes_nao_confirmadas[produto];
+                        
+                        // Atualizar input numérico
+                        const input = $('input[data-produto="' + produto + '"]');
+                        if (input.length) {
+                            input.val(quantidade);
+                        }
+                        
+                        // Atualizar slider correspondente
+                        const sliderId = input.attr('id');
+                        if (sliderId) {
+                            const sliderIndex = sliderId.split('_')[1];
+                            const slider = $('#slider_' + sliderIndex);
+                            if (slider.length) {
+                                slider.val(quantidade);
+                            }
+                        }
+                        
+                        // Trigger do evento para atualizar displays
+                        input.trigger('input');
+                    });
+                    
+                    // Recalcular recursos após atualizar sliders
+                    calcularRecursos();
+                }
+                
+                // Verificar se mudou de iteração ou estado
+                if (data.iteracao_atual !== ultimaIteracao || data.iteracao_aberta !== iteracaoAberta) {
+                    
+                    // Se abriu nova iteração
+                    if (data.iteracao_aberta && !iteracaoAberta) {
+                        console.log('Nova iteração aberta! Recarregando página...');
+                        iteracaoAberta = true;
+                        ultimaIteracao = data.iteracao_atual;
+                        processandoTurno = false;
+                        
+                        // Recarregar página para mostrar formulário
+                        location.reload();
+                    } 
+                    // Se fechou iteração (turno processado)
+                    else if (!data.iteracao_aberta && iteracaoAberta) {
+                        console.log('Turno processado! Recarregando resultados...');
+                        iteracaoAberta = false;
+                        ultimaIteracao = data.iteracao_atual;
+                        
+                        // Mostrar status "CALCULANDO..."
+                        atualizarStatusJogo('calculando');
+                        
+                        // Aguardar 1 segundo e recarregar para garantir que backend salvou
+                        setTimeout(function() {
+                            console.log('Recarregando página com resultados...');
+                            location.reload();
+                        }, 1000);
+                    }
+                    // Se apenas mudou número da iteração
+                    else if (data.iteracao_atual !== ultimaIteracao) {
+                        console.log('Número da iteração mudou: ' + ultimaIteracao + ' -> ' + data.iteracao_atual);
+                        ultimaIteracao = data.iteracao_atual;
+                    }
+                }
+                
+                // Atualizar barras de progresso dos recursos
+                atualizarBarrasProgresso(data.recursos, data.recursos_maximos);
+            },
+            error: function(xhr, status, error) {
+                console.error('Erro ao atualizar estado:', error);
+            }
+        });
+    }
+    
+    function atualizarStatusJogo(estado) {
+        const card = $('#status-jogo-card');
+        const icon = $('#status-icon');
+        const titulo = $('#status-titulo');
+        const descricao = $('#status-descricao');
+        const badge = $('#status-badge');
+        
+        card.removeClass('border-success border-warning border-info border-secondary');
+        
+        switch(estado) {
+            case 'aberta':
+                icon.html('🎯');
+                titulo.html('Aberta para Envio de Decisões');
+                descricao.html('Você pode ajustar e enviar sua decisão de produção');
+                badge.html('<span class="badge bg-success fs-6 px-3 py-2">ENVIO LIBERADO</span>');
+                card.addClass('border-success').css('border-width', '3px');
+                break;
+                
+            case 'calculando':
+                icon.html('⚙️');
+                titulo.html('<span class="spinner-border spinner-border-sm me-2"></span>CALCULANDO RESULTADOS...');
+                descricao.html('O professor está processando o turno. Aguarde os resultados.');
+                badge.html('<span class="badge bg-warning fs-6 px-3 py-2">PROCESSANDO</span>');
+                card.addClass('border-warning').css('border-width', '3px');
+                
+                // Desabilitar formulário se existir
+                $('#formDecisao :input').prop('disabled', true);
+                break;
+                
+            case 'resultados':
+                icon.html('✅');
+                titulo.html('Resultados Prontos!');
+                descricao.html('Turno processado com sucesso. Confira seus resultados abaixo.');
+                badge.html('<span class="badge bg-info fs-6 px-3 py-2">RESULTADOS PRONTOS</span>');
+                card.addClass('border-info').css('border-width', '3px');
+                break;
+                
+            case 'aguardando':
+            default:
+                icon.html('⏰');
+                titulo.html('Aguardando Abertura de Nova Iteração');
+                descricao.html('Aguarde o professor abrir a próxima rodada');
+                badge.html('<span class="badge bg-secondary fs-6 px-3 py-2">AGUARDANDO</span>');
+                card.addClass('border-secondary').css('border-width', '2px');
+                break;
+        }
+    }
+
+    
+    function atualizarBarrasProgresso(recursos, maximos) {
+        // Atualizar cada barra de progresso se existir
+        const recursosInfo = [
+            {id: 'dinheiro', valor: recursos.dinheiro, max: maximos.dinheiro},
+            {id: 'materia', valor: recursos.materia_prima, max: maximos.materia_prima},
+            {id: 'energia', valor: recursos.energia, max: maximos.energia},
+            {id: 'trabalhadores', valor: recursos.trabalhadores, max: maximos.trabalhadores}
+        ];
+        
+        recursosInfo.forEach(function(rec) {
+            const percentual = (rec.valor / rec.max) * 100;
+            const barra = $('#barra-' + rec.id);
+            if (barra.length) {
+                barra.css('width', Math.min(percentual, 100) + '%');
+                barra.attr('aria-valuenow', rec.valor);
+            }
+        });
+    }
+    
+    // Atualizar a cada 3 segundos
+    setInterval(atualizarEstadoJogo, 3000);
+</script>
+{% endblock %}

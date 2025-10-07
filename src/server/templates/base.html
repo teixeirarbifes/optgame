@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ portal_title }}{% if empresa %} • {{ empresa.nome }}{% endif %}</title>
+    <style>
+        :root {
+            color-scheme: dark light;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --card-alt: #16213d;
+            --accent: #38bdf8;
+            --accent-muted: #0ea5e9;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --success: #34d399;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(14,165,233,0.35), rgba(15,23,42,0.9));
+            border-bottom: 1px solid rgba(148,163,184,0.2);
+        }
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+            font-weight: 700;
+        }
+        header p {
+            margin: 0.6rem 0 0;
+            color: var(--text-muted);
+            max-width: 720px;
+        }
+        main {
+            padding: clamp(1rem, 2vw, 2rem);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .grid {
+            display: grid;
+            gap: 1.2rem;
+        }
+        .grid.cols-2 {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+        }
+        .card {
+            background: var(--card);
+            border-radius: 18px;
+            border: 1px solid rgba(148,163,184,0.12);
+            padding: clamp(1rem, 1.4vw, 1.6rem);
+            box-shadow: 0 16px 40px rgba(15,23,42,0.35);
+        }
+        .card h2 {
+            margin: 0 0 0.8rem;
+            font-size: 1.2rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .card h3 {
+            margin: 0.6rem 0;
+            font-size: 1rem;
+            color: var(--text);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            background: var(--card-alt);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        th {
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(148,163,184,0.1);
+        }
+        tr:nth-child(even) {
+            background: rgba(15,23,42,0.45);
+        }
+        tr:hover {
+            background: rgba(14,165,233,0.12);
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(148,163,184,0.16);
+            color: var(--text);
+        }
+        .pill.ok { background: rgba(52, 211, 153, 0.18); color: var(--success); }
+        .pill.atencao { background: rgba(251, 191, 36, 0.18); color: var(--warning); }
+        .pill.deficit { background: rgba(248, 113, 113, 0.18); color: var(--danger); }
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: var(--accent);
+            color: #0f172a;
+            padding: 0.65rem 1.1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+        .cta:hover {
+            background: var(--accent-muted);
+        }
+        form {
+            display: grid;
+            gap: 1rem;
+        }
+        label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.9rem;
+            border: 1px solid rgba(148,163,184,0.2);
+            background: rgba(15,23,42,0.6);
+            color: var(--text);
+            font-size: 1rem;
+        }
+        input[type="password"]:focus {
+            outline: 2px solid var(--accent);
+        }
+        button {
+            border: none;
+            border-radius: 0.9rem;
+            padding: 0.75rem 1rem;
+            background: var(--accent);
+            color: #0f172a;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        button:hover {
+            background: var(--accent-muted);
+        }
+        ul {
+            margin: 0;
+            padding-left: 1.2rem;
+            line-height: 1.6;
+        }
+        code, pre {
+            font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+        }
+        pre.modelo {
+            margin: 0;
+            background: rgba(15,23,42,0.66);
+            border-radius: 1rem;
+            padding: 1rem;
+            white-space: pre-wrap;
+        }
+        @media (max-width: 720px) {
+            header {
+                text-align: center;
+            }
+            .grid cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>{{ portal_title }}</h1>
+    <p>Ambiente responsivo para consulta remota de indicadores, restrições e materiais de apoio do simulador de produção.</p>
+</header>
+<main>
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>

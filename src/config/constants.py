@@ -1,90 +1,114 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-Configurações e constantes do jogo
+Configuracoes e constantes do jogo
 """
 
 class GameConfig:
-    """Configuração do jogo"""
+    """Configuracao do jogo"""
     
-    # Configurações gerais
     MAX_ITERACOES = 12
-    MAX_TURNOS = 12  # Alias para compatibilidade
+    MAX_TURNOS = 12
     
-    # Configurações da janela
-    WINDOW_TITLE = "🏭 PLANEJADOR DE PRODUÇÃO OTIMIZADO - MULTI-EMPRESAS"
+    WINDOW_TITLE = "PLANEJADOR DE PRODUCAO OTIMIZADO - MULTI-EMPRESAS"
     WINDOW_GEOMETRY = (50, 50, 1400, 800)
     WINDOW_MIN_SIZE = (1000, 600)
+
+    PORTAL_ENABLED = True
+    PORTAL_HOST = "0.0.0.0"
+    PORTAL_PORT = 8050
+    PORTAL_TITLE = "Portal Educacional de Producao"
+    PORTAL_PASSWORD_SIZE = 8
     
-    # Recursos base disponíveis para o mês
     RECURSOS_BASE = {
         "dinheiro": 50000,
-        "materia_prima": 2500,
-        "energia": 3500,
-        "trabalhadores": 100
+        "materia_prima": 20000,
+        "energia": 15000,
+        "trabalhadores": 600
     }
     
-    # Custos unitários r_j (valor monetário de uma unidade de recurso)
     CUSTOS_UNITARIOS_RECURSOS = {
-        "dinheiro": 1.0,              # cada 1 dólar investido
-        "materia_prima": 12.0,        # custo por unidade de matéria-prima
-        "energia": 0.45,              # custo por kWh equivalente
-        "trabalhadores": 28.0         # custo por colaborador-hora
+        "materia_prima": 1.20,
+        "energia": 0.65,
+        "trabalhadores": 22.00
     }
     
-    # Produtos com características mais realistas (compartilhado entre empresas)
     PRODUTOS = {
-        "📱 Smartphone": {
-            "custo_materia": 45,
-            "custo_energia": 25,
-            "custo_trabalhadores": 3,
-            "preco_venda": 180,
-            "tempo_producao": 2,
+        "Smartphone": {
+            "consumo_materia": 12,
+            "consumo_energia": 7,
+            "consumo_trabalhadores": 0.5,
+            "preco_venda": 95,
             "cor": "#E74C3C",
-            "emoji": "📱"
+            "emoji": ""
         },
-        "💻 Laptop": {
-            "custo_materia": 85,
-            "custo_energia": 60,
-            "custo_trabalhadores": 5,
-            "preco_venda": 350,
-            "tempo_producao": 3,
+        "Laptop": {
+            "consumo_materia": 30,
+            "consumo_energia": 15,
+            "consumo_trabalhadores": 0.8,
+            "preco_venda": 165,
             "cor": "#3498DB",
-            "emoji": "💻"
+            "emoji": ""
         },
-        "🖥️ Desktop": {
-            "custo_materia": 120,
-            "custo_energia": 80,
-            "custo_trabalhadores": 7,
-            "preco_venda": 480,
-            "tempo_producao": 4,
+        "Desktop": {
+            "consumo_materia": 45,
+            "consumo_energia": 22,
+            "consumo_trabalhadores": 1.2,
+            "preco_venda": 220,
             "cor": "#9B59B6",
-            "emoji": "🖥️"
+            "emoji": ""
+        },
+        "Smartwatch": {
+            "consumo_materia": 8,
+            "consumo_energia": 4,
+            "consumo_trabalhadores": 0.35,
+            "preco_venda": 58,
+            "cor": "#1ABC9C",
+            "emoji": ""
+        },
+        "Impressora": {
+            "consumo_materia": 25,
+            "consumo_energia": 18,
+            "consumo_trabalhadores": 0.6,
+            "preco_venda": 135,
+            "cor": "#34495E",
+            "emoji": ""
+        },
+        "Camera": {
+            "consumo_materia": 18,
+            "consumo_energia": 9,
+            "consumo_trabalhadores": 0.7,
+            "preco_venda": 110,
+            "cor": "#E67E22",
+            "emoji": ""
         }
     }
     
-    # Mapeamento de recursos para campos de custo nos produtos
-    MAPEAMENTO_CUSTO = {
-        'materia_prima': 'custo_materia',
-        'energia': 'custo_energia',
-        'trabalhadores': 'custo_trabalhadores'
+    MAPEAMENTO_CONSUMO = {
+        'materia_prima': 'consumo_materia',
+        'energia': 'consumo_energia',
+        'trabalhadores': 'consumo_trabalhadores'
     }
     
-    # Emojis e nomes legíveis para recursos
+    MAPEAMENTO_CUSTO = {
+        'materia_prima': 'consumo_materia',
+        'energia': 'consumo_energia',
+        'trabalhadores': 'consumo_trabalhadores'
+    }
+    
     EMOJI_RECURSO = {
-        "dinheiro": "💰", 
-        "materia_prima": "📦", 
-        "energia": "⚡", 
-        "trabalhadores": "👥"
+        "dinheiro": "", 
+        "materia_prima": "", 
+        "energia": "", 
+        "trabalhadores": ""
     }
     
     NOMES_RECURSOS = {
         "dinheiro": "Dinheiro", 
-        "materia_prima": "Matéria-prima", 
+        "materia_prima": "Materia-prima", 
         "energia": "Energia", 
         "trabalhadores": "Equipe"
     }
     
-    # Cores de acento para recursos
     CORES_ACENTO = {
         "dinheiro": "#1ABC9C",
         "materia_prima": "#E67E22",
@@ -92,20 +116,64 @@ class GameConfig:
         "trabalhadores": "#9B59B6"
     }
     
-    # Assegurar que produtos tenham custo financeiro básico
-    @classmethod
-    def inicializar_produtos(cls):
-        """Garante custo financeiro básico caso não esteja definido"""
-        for dados_produto in cls.PRODUTOS.values():
-            if 'custo_dinheiro' not in dados_produto:
-                dados_produto['custo_dinheiro'] = (
-                    dados_produto.get('custo_materia', 0)
-                    + dados_produto.get('custo_energia', 0)
-                    + dados_produto.get('custo_trabalhadores', 0)
-                )
-    
     @classmethod
     def get_produtos_inicializados(cls):
-        """Retorna produtos com custos financeiros inicializados"""
-        cls.inicializar_produtos()
         return cls.PRODUTOS.copy()
+    
+    @classmethod
+    def calcular_custo_produto(cls, produto_nome, quantidade):
+        if produto_nome not in cls.PRODUTOS:
+            return {}
+        
+        produto = cls.PRODUTOS[produto_nome]
+        
+        return {
+            'consumo_materia': produto.get('consumo_materia', 0) * quantidade,
+            'consumo_energia': produto.get('consumo_energia', 0) * quantidade,
+            'consumo_trabalhadores': produto.get('consumo_trabalhadores', 0) * quantidade,
+            'custo_monetario': (
+                produto.get('consumo_materia', 0) * quantidade * cls.CUSTOS_UNITARIOS_RECURSOS['materia_prima'] +
+                produto.get('consumo_energia', 0) * quantidade * cls.CUSTOS_UNITARIOS_RECURSOS['energia'] +
+                produto.get('consumo_trabalhadores', 0) * quantidade * cls.CUSTOS_UNITARIOS_RECURSOS['trabalhadores']
+            ),
+            'receita': produto.get('preco_venda', 0) * quantidade
+        }
+    
+    @classmethod
+    def validar_decisao(cls, decisoes, recursos_disponiveis):
+        consumo_total = {
+            'materia_prima': 0,
+            'energia': 0,
+            'trabalhadores': 0,
+            'dinheiro': 0
+        }
+        
+        for produto, quantidade in decisoes.items():
+            if quantidade <= 0:
+                continue
+            if produto not in cls.PRODUTOS:
+                continue
+                
+            dados = cls.PRODUTOS[produto]
+            consumo_total['materia_prima'] += dados.get('consumo_materia', 0) * quantidade
+            consumo_total['energia'] += dados.get('consumo_energia', 0) * quantidade
+            consumo_total['trabalhadores'] += dados.get('consumo_trabalhadores', 0) * quantidade
+            consumo_total['dinheiro'] += (
+                dados.get('consumo_materia', 0) * quantidade * cls.CUSTOS_UNITARIOS_RECURSOS['materia_prima'] +
+                dados.get('consumo_energia', 0) * quantidade * cls.CUSTOS_UNITARIOS_RECURSOS['energia'] +
+                dados.get('consumo_trabalhadores', 0) * quantidade * cls.CUSTOS_UNITARIOS_RECURSOS['trabalhadores']
+            )
+        
+        violacoes = []
+        for recurso in ['dinheiro', 'materia_prima', 'energia', 'trabalhadores']:
+            necessario = consumo_total[recurso]
+            disponivel = recursos_disponiveis.get(recurso, 0)
+            if necessario > disponivel:
+                violacoes.append({
+                    'recurso': recurso,
+                    'necessario': necessario,
+                    'disponivel': disponivel,
+                    'deficit': necessario - disponivel
+                })
+        
+        return (len(violacoes) == 0, violacoes)

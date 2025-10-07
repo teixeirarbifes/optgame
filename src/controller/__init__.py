@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Pacote de controle do jogo."""
+"""Camada de controle da aplicação."""
 
 from .controller import GameController, TurnoResultado
 

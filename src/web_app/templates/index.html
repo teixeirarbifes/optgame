@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Início - Jogo de Produção{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center" style="min-height: 80vh; align-items: center;">
+        <div class="col-lg-10">
+            <!-- Hero Section -->
+            <div class="text-center mb-5">
+                <h1 class="display-3 fw-bold text-white mb-4">
+                    <i class="bi bi-gear-wide-connected"></i> Jogo de Produção Empresarial
+                </h1>
+                <p class="lead text-white-50 mb-5">
+                    Simulador educacional de gestão e otimização de produção para múltiplas empresas
+                </p>
+            </div>
+
+            <!-- Cards de Acesso -->
+            <div class="row g-4">
+                <!-- Card Admin -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body text-center p-5">
+                            <div class="mb-4">
+                                <i class="bi bi-shield-lock-fill text-primary" style="font-size: 4rem;"></i>
+                            </div>
+                            <h3 class="card-title mb-3">Área Administrativa</h3>
+                            <p class="card-text text-muted mb-4">
+                                Gerenciar empresas, processar turnos, visualizar estatísticas e controlar o jogo
+                            </p>
+                            <a href="{{ url_for('admin.login') }}" class="btn btn-primary btn-lg btn-custom">
+                                <i class="bi bi-box-arrow-in-right"></i> Acessar Admin
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Alunos -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body text-center p-5">
+                            <div class="mb-4">
+                                <i class="bi bi-people-fill text-success" style="font-size: 4rem;"></i>
+                            </div>
+                            <h3 class="card-title mb-3">Área dos Alunos</h3>
+                            <p class="card-text text-muted mb-4">
+                                Acessar dashboard da empresa, enviar decisões de produção e acompanhar resultados
+                            </p>
+                            <a href="{{ url_for('aluno.login') }}" class="btn btn-success btn-lg btn-custom">
+                                <i class="bi bi-box-arrow-in-right"></i> Acessar Empresa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="row mt-5 g-4">
+                <div class="col-md-4">
+                    <div class="card bg-dark text-white h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-graph-up-arrow text-info" style="font-size: 2.5rem;"></i>
+                            <h5 class="mt-3">Dashboards Interativos</h5>
+                            <p class="small">Gráficos em tempo real e métricas detalhadas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-dark text-white h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-lightning-charge text-warning" style="font-size: 2.5rem;"></i>
+                            <h5 class="mt-3">Interface Fluida</h5>
+                            <p class="small">Atualizações via AJAX sem recarregar página</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-dark text-white h-100">
+                        <div class="card-body text-center p-4">
+                            <i class="bi bi-trophy text-success" style="font-size: 2.5rem;"></i>
+                            <h5 class="mt-3">Sistema de Ranking</h5>
+                            <p class="small">Compare desempenho entre empresas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

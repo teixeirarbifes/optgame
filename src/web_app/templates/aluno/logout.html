@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout - Jogo de Produção</title>
+</head>
+<body>
+    <script>
+        // Limpar sessionStorage
+        sessionStorage.removeItem('optgame_session_id');
+        sessionStorage.clear();
+        
+    // Redirecionar para a página de login do aluno
+    window.location.href = '/aluno/login';
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+{
+  "iteracao_atual": 2,
+  "max_iteracoes": 12,
+  "empresas": {
+    "TechCorp": {
+      "nome": "TechCorp",
+      "equipe": "",
+      "senha": "12",
+      "recursos_base": {
+        "dinheiro": 60000,
+        "materia_prima": 25000,
+        "energia": 18000,
+        "trabalhadores": 800
+      },
+      "recursos_disponiveis": {
+        "dinheiro": 60000,
+        "materia_prima": 25000,
+        "energia": 18000,
+        "trabalhadores": 800
+      },
+      "decisao_atual": {},
+      "decisao_confirmada": false,
+      "historico": [
+        {
+          "turno": 1,
+          "decisao": {
+            "📱 Smartphone": 312,
+            "💻 Laptop": 443,
+            "�️ Desktop": 510,
+            "⌚ Smartwatch": 248,
+            "�️ Impressora": 634,
+            "📷 Câmera": 368
+          },
+          "receita": 0,
+          "custo": 0,
+          "lucro": 0,
+          "consumo": {
+            "materia_prima": 73517.0,
+            "energia": 35500.0,
+            "trabalhadores": 2376.8,
+            "dinheiro": 198095.5
+          },
+          "violacoes": [
+            {
+              "recurso": "materia_prima",
+              "necessario": 73517.0,
+              "disponivel": 25000,
+              "deficit": 48517.0
+            },
+            {
+              "recurso": "energia",
+              "necessario": 35500.0,
+              "disponivel": 18000,
+              "deficit": 17500.0
+            },
+            {
+              "recurso": "trabalhadores",
+              "necessario": 2376.8,
+              "disponivel": 800,
+              "deficit": 1576.8000000000002
+            }
+          ],
+          "recursos_apos": {
+            "dinheiro": 60000,
+            "materia_prima": 25000,
+            "energia": 18000,
+            "trabalhadores": 800
+          }
+        }
+      ],
+      "historico_decisoes": [],
+      "historico_recursos": {
+        "turnos": [
+          1
+        ],
+        "dinheiro": [
+          60000
+        ],
+        "materia_prima": [
+          25000
+        ],
+        "energia": [
+          18000
+        ],
+        "trabalhadores": [
+          800
+        ]
+      },
+      "lucro_total": 0,
+      "criada_em": "2025-10-06T21:20:54.160534",
+      "lucro_ultimo_turno": 0,
+      "historico_lucros": {
+        "turnos": [
+          1
+        ],
+        "valores": [
+          0
+        ]
+      }
+    }
+  },
+  "iteracao_aberta": false,
+  "historico_global": [
+    {
+      "turno": 1,
+      "timestamp": "2025-10-06T21:22:34.273424",
+      "resultados": [
+        {
+          "empresa": "TechCorp",
+          "status": "processado",
+          "lucro": 0,
+          "detalhes": [
+            {
+              "status": "violação",
+              "mensagem": "Decisão não executada por recursos insuficientes"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "produtos": {
+    "📱 Smartphone": {
+      "consumo_materia": 15,
+      "consumo_energia": 8,
+      "consumo_trabalhadores": 0.4,
+      "preco_venda": 85,
+      "cor": "#E74C3C",
+      "emoji": "📱"
+    },
+    "💻 Laptop": {
+      "consumo_materia": 35,
+      "consumo_energia": 18,
+      "consumo_trabalhadores": 1.2,
+      "preco_venda": 180,
+      "cor": "#3498DB",
+      "emoji": "�"
+    },
+    "�️ Desktop": {
+      "consumo_materia": 50,
+      "consumo_energia": 25,
+      "consumo_trabalhadores": 1.8,
+      "preco_venda": 250,
+      "cor": "#9B59B6",
+      "emoji": "🖥️"
+    },
+    "⌚ Smartwatch": {
+      "consumo_materia": 8,
+      "consumo_energia": 4,
+      "consumo_trabalhadores": 0.3,
+      "preco_venda": 45,
+      "cor": "#1ABC9C",
+      "emoji": "⌚"
+    },
+    "�️ Impressora": {
+      "consumo_materia": 28,
+      "consumo_energia": 12,
+      "consumo_trabalhadores": 0.8,
+      "preco_venda": 120,
+      "cor": "#34495E",
+      "emoji": "🖨️"
+    },
+    "📷 Câmera": {
+      "consumo_materia": 22,
+      "consumo_energia": 10,
+      "consumo_trabalhadores": 0.6,
+      "preco_venda": 95,
+      "cor": "#E67E22",
+      "emoji": "�"
+    }
+  },
+  "_metadata": {
+    "versao": "2.1",
+    "data_save": "2025-10-06T21:22:40.601360",
+    "total_empresas": 1,
+    "iteracao_atual": 2
+  }
+}

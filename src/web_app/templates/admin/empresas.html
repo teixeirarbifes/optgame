@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Empresas{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-white">
+                <i class="bi bi-building"></i> Gerenciar Empresas
+            </h2>
+            <p class="text-white-50">Adicionar, editar e remover empresas participantes</p>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#modalNovaEmpresa">
+                <i class="bi bi-plus-circle"></i> Nova Empresa
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for nome, empresa in empresas.items() %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>{{ nome }}</strong>
+                    {% if empresa.decisao_confirmada %}
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> Confirmada
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning">
+                        <i class="bi bi-clock"></i> Pendente
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Equipe:</strong> {{ empresa.equipe or 'Não definida' }}
+                    </p>
+                    <p class="mb-2">
+                        <strong>Senha:</strong> 
+                        <code class="bg-light p-1 rounded">{{ empresa.senha }}</code>
+                    </p>
+                    <p class="mb-2">
+                        <strong>Lucro Total:</strong>
+                        <span class="badge {% if empresa.lucro_total > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            R$ {{ "%.2f"|format(empresa.lucro_total) }}
+                        </span>
+                    </p>
+                    
+                    <hr>
+                    
+                    <h6 class="text-muted">Recursos Disponíveis:</h6>
+                    <ul class="list-unstyled small">
+                        <li>💰 Dinheiro: R$ {{ "%.0f"|format(empresa.recursos_disponiveis.dinheiro) }}</li>
+                        <li>📦 Matéria-Prima: {{ "%.0f"|format(empresa.recursos_disponiveis.materia_prima) }}</li>
+                        <li>⚡ Energia: {{ "%.0f"|format(empresa.recursos_disponiveis.energia) }}</li>
+                        <li>👥 Trabalhadores: {{ "%.0f"|format(empresa.recursos_disponiveis.trabalhadores) }}</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-outline-danger" onclick="removerEmpresa('{{ nome }}')">
+                            <i class="bi bi-trash"></i> Remover Empresa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> Nenhuma empresa cadastrada. 
+                Clique em "Nova Empresa" para adicionar.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal Nova Empresa -->
+<div class="modal fade" id="modalNovaEmpresa" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle"></i> Adicionar Nova Empresa
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovaEmpresa">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nomeEmpresa" class="form-label">Nome da Empresa *</label>
+                            <input type="text" class="form-control" id="nomeEmpresa" required placeholder="Ex: TechCorp">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="equipeEmpresa" class="form-label">Nome da Equipe</label>
+                            <input type="text" class="form-control" id="equipeEmpresa" placeholder="Ex: Equipe Alpha">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="senhaEmpresa" class="form-label">Senha de Acesso *</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="senhaEmpresa" required placeholder="Digite a senha">
+                                <button class="btn btn-outline-secondary" type="button" onclick="gerarSenha()">
+                                    <i class="bi bi-shuffle"></i> Gerar
+                                </button>
+                            </div>
+                            <div class="form-text">Os alunos usarão esta senha para fazer login</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="criarEmpresa()">
+                    <i class="bi bi-check-circle"></i> Criar Empresa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function gerarSenha() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let senha = '';
+        for (let i = 0; i < 8; i++) {
+            senha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        $('#senhaEmpresa').val(senha);
+    }
+    
+    function criarEmpresa() {
+        const nome = $('#nomeEmpresa').val().trim();
+        const equipe = $('#equipeEmpresa').val().trim();
+        const senha = $('#senhaEmpresa').val().trim();
+        
+        if (!nome || !senha) {
+            showToast('Preencha todos os campos obrigatórios', 'warning');
+            return;
+        }
+        
+        showLoading();
+        $.ajax({
+            url: '/api/admin/criar-empresa',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({nome, equipe, senha}),
+            success: function(response) {
+                hideLoading();
+                if (response.sucesso) {
+                    showToast(response.mensagem, 'success');
+                    $('#modalNovaEmpresa').modal('hide');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast(response.mensagem, 'danger');
+                }
+            },
+            error: function() {
+                hideLoading();
+                showToast('Erro ao criar empresa', 'danger');
+            }
+        });
+    }
+    
+    function removerEmpresa(nome) {
+        if (!confirm(`Tem certeza que deseja remover a empresa "${nome}"?\n\nTodos os dados serão perdidos!`)) {
+            return;
+        }
+        
+        showLoading();
+        $.ajax({
+            url: `/api/admin/remover-empresa/${encodeURIComponent(nome)}`,
+            method: 'DELETE',
+            success: function(response) {
+                hideLoading();
+                if (response.sucesso) {
+                    showToast('Empresa removida com sucesso', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showToast(response.mensagem || 'Erro ao remover empresa', 'danger');
+                }
+            },
+            error: function() {
+                hideLoading();
+                showToast('Erro ao remover empresa', 'danger');
+            }
+        });
+    }
+</script>
+{% endblock %}
