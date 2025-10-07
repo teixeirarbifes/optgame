@@ -125,7 +125,7 @@ if os.path.exists('backup.json'):
 
 ### Produção:
 **SEMPRE MUDE**:
-1. Senha do admin (default: `admin123`)
+1. Senha do admin (default: `admin1064*`)
 2. Secret key do Flask
 3. Use HTTPS
 4. Configure firewall

@@ -106,7 +106,7 @@ Login administrativo
 
 **Body (form-data):**
 ```
-senha=admin123
+senha=admin1064*
 ```
 
 **Response:** Redirect to `/admin/dashboard`
@@ -501,7 +501,7 @@ for empresa in ranking:
 
 # Criar empresa (com sessão admin)
 session = requests.Session()
-session.post(f'{BASE_URL}/admin/login', data={'senha': 'admin123'})
+session.post(f'{BASE_URL}/admin/login', data={'senha': 'admin1064*'})
 
 response = session.post(
     f'{BASE_URL}/api/admin/criar-empresa',

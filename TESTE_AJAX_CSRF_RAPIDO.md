@@ -60,7 +60,7 @@ $('meta[name="csrf-token"]').attr('content')
 
 ### 5️⃣ **Teste: Processar Turno (Admin)**
 
-1. Faça login como admin (senha: `admin123`)
+1. Faça login como admin (senha: `admin1064*`)
 2. No dashboard, clique **"Processar Turno Atual"**
 3. Confirme o dialog
 4. DevTools → **Network** → Requisição `processar-turno`

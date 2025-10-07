@@ -31,7 +31,7 @@ python setup_demo.py
 python web_server.py
 
 # Acessar
-# Admin: http://localhost:5000/admin (senha: admin123)
+# Admin: http://localhost:5000/admin (senha: admin1064*)
 # Alunos: http://localhost:5000/aluno
 ```
 

@@ -11,7 +11,7 @@ class GameState:
     """Gerencia o estado global do jogo"""
     
     def __init__(self):
-        self.admin_password = "admin123"  # Senha hardcoded - definir ANTES de reset
+        self.admin_password = "admin1064*"  # Senha admin - definir ANTES de reset
         self.session_version = 1  # Incrementa quando sessões devem ser invalidadas
         self.auto_save_enabled = False  # Auto-save após cada iteração
         self.calcular_otimo_ao_criar = False  # Calcular solução ótima ao criar empresa (padrão: False)

@@ -54,7 +54,7 @@ Histórico de versões e mudanças do Jogo de Produção.
   - Sistema multiplayer real
   
 - **Área Administrativa**
-  - Login com senha (hardcoded: admin123)
+  - Login com senha: admin1064*
   - Dashboard com estatísticas em tempo real
   - Controles do jogo (processar, abrir iteração, resetar)
   - Ranking de empresas

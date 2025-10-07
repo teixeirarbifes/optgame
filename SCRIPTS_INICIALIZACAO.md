@@ -14,7 +14,7 @@ start_web.bat
 - Ativa o ambiente Poetry automaticamente
 - Inicia o servidor Flask na porta 5000
 - Mostra instruções de acesso
-- Senha admin: admin123
+- Senha admin: admin1064*
 
 **Acesso:**
 - Admin: http://localhost:5000/admin/login
@@ -143,7 +143,7 @@ Pressione Ctrl+C no terminal
 1. Execute `install_web_poetry.bat` (uma vez)
 2. Execute `start_web.bat`
 3. Acesse http://localhost:5000/admin/login
-4. Senha: `admin123`
+4. Senha: `admin1064*`
 5. Crie empresas para os alunos
 6. Compartilhe link: http://localhost:5000/aluno/login
 

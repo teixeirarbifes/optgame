@@ -14,7 +14,7 @@ Acesse: http://localhost:5000
 ### 2. Login Admin
 
 - URL: http://localhost:5000/admin/login
-- Senha: `admin123`
+- Senha: `admin1064*`
 
 ### 3. Criar Empresa de Teste
 

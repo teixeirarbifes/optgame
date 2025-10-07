@@ -33,7 +33,7 @@ python3 web_server.py
 
 ### 👨‍🏫 Professor (Admin)
 - **URL**: http://localhost:5000/admin
-- **Senha**: `admin123`
+- **Senha**: `admin1064*`
 
 ### 👨‍🎓 Alunos (Empresas Demo)
 - **URL**: http://localhost:5000/aluno
@@ -58,7 +58,7 @@ Para descobrir seu IP:
 ## 🎮 Como Jogar
 
 ### 1️⃣ Professor: Preparar Jogo
-1. Acesse `/admin` com senha `admin123`
+1. Acesse `/admin` com senha `admin1064*`
 2. Crie empresas (ou use as demo)
 3. Anote as senhas das empresas
 

@@ -15,7 +15,7 @@ Sistema web interativo e responsivo para simulação de gestão e otimização d
 - Processar turnos do jogo
 - Visualizar ranking e estatísticas
 - Controlar abertura/fechamento de iterações
-- **Senha**: `admin123` (hardcoded)
+- **Senha**: `admin1064*`
 
 ### 👨‍🎓 Área dos Alunos
 - Dashboard personalizado por empresa
@@ -62,7 +62,7 @@ O servidor será iniciado em:
 
 #### 👨‍🏫 Professor (Admin):
 1. Acesse: http://localhost:5000/admin
-2. Senha: `admin123`
+2. Senha: `admin1064*`
 3. Crie empresas para os alunos
 4. Gerencie o jogo
 
@@ -175,12 +175,12 @@ Para ambiente de produção, considere:
 
 1. **Trocar senha do admin**:
    - Edite `src/web_app/game_state.py`
-   - Linha: `self.admin_password = "admin123"`
+   - Linha: `self.admin_password = "admin1064*"`
 
 2. **Usar variáveis de ambiente**:
 ```python
 import os
-self.admin_password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+self.admin_password = os.environ.get('ADMIN_PASSWORD', 'admin1064*')
 ```
 
 3. **HTTPS**: Use certificado SSL
