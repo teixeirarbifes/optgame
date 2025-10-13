@@ -7,13 +7,22 @@
     <!-- Header -->
     <div class="row mb-4">
         <div class="col">
-            <h2 class="text-white">
-                <i class="bi bi-building"></i> {{ empresa.nome }}
-            </h2>
-            <p class="text-white-50">
-                {% if empresa.equipe %}Equipe: {{ empresa.equipe }} | {% endif %}
-                Iteração <span id="numero-iteracao">{{ iteracao_atual }}</span>
-            </p>
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h2 class="text-white">
+                        <i class="bi bi-building"></i> {{ empresa.nome }}
+                    </h2>
+                    <p class="text-white-50 mb-0">
+                        {% if empresa.equipe %}Equipe: {{ empresa.equipe }} | {% endif %}
+                        Iteração <span id="numero-iteracao">{{ iteracao_atual }}</span>
+                    </p>
+                </div>
+                <div>
+                    <button class="btn btn-info btn-sm" onclick="mostrarTutorial()" title="Como Jogar">
+                        <i class="bi bi-question-circle"></i> Tutorial
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -984,6 +993,27 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Tutorial -->
+<div class="modal fade" id="modalTutorial" tabindex="-1" aria-labelledby="modalTutorialLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalTutorialLabel">
+                    <i class="bi bi-question-circle"></i> Como Jogar - Tutorial do Simulador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% include 'partials/tutorial.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -1743,6 +1773,11 @@
                 });
             }, 100);
         }
+    }
+    
+    // Função para mostrar modal do tutorial
+    function mostrarTutorial() {
+        $('#modalTutorial').modal('show');
     }
 </script>
 {% endblock %}

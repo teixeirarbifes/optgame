@@ -1,0 +1,307 @@
+<!-- Tutorial do Jogo -->
+<div class="tutorial-content">
+    <!-- Introdução -->
+    <div class="alert alert-primary">
+        <h5 class="mb-2"><i class="bi bi-lightbulb"></i> Bem-vindo ao Simulador de Produção!</h5>
+        <p class="mb-0">
+            Este é um jogo educacional sobre <strong>otimização de produção</strong>. 
+            Você vai tomar decisões de quanto produzir de cada produto, considerando recursos limitados e buscando maximizar o lucro.
+        </p>
+    </div>
+
+    <!-- Dinâmica do Jogo -->
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0"><i class="bi bi-diagram-3"></i> Como Funciona a Dinâmica do Jogo</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-primary"><i class="bi bi-person-badge"></i> Papel do Professor (Admin)</h6>
+                    <ol class="small">
+                        <li><strong>Abre a Iteração:</strong> Libera para as empresas tomarem decisões</li>
+                        <li><strong>Acompanha:</strong> Vê quem já enviou decisão</li>
+                        <li><strong>Processa o Turno:</strong> Calcula resultados de todas as decisões</li>
+                        <li><strong>Repete:</strong> Abre nova iteração até completar 12 turnos</li>
+                    </ol>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-success"><i class="bi bi-building"></i> Papel das Empresas (Alunos)</h6>
+                    <ol class="small">
+                        <li><strong>Aguarda Abertura:</strong> Espera professor abrir a iteração</li>
+                        <li><strong>Decide Produção:</strong> Define quantidades usando sliders</li>
+                        <li><strong>Confirma Decisão:</strong> Envia para o professor</li>
+                        <li><strong>Vê Resultados:</strong> Após processamento, analisa lucro e consumo</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-3 mb-0">
+                <i class="bi bi-arrow-repeat"></i> <strong>Ciclo do Jogo:</strong>
+                <div class="text-center mt-2">
+                    <span class="badge bg-primary">Admin Abre</span> 
+                    → <span class="badge bg-success">Empresas Decidem</span> 
+                    → <span class="badge bg-warning text-dark">Empresas Confirmam</span> 
+                    → <span class="badge bg-danger">Admin Processa</span> 
+                    → <span class="badge bg-secondary">Resultados</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mecânicas do Jogo -->
+    <div class="card mb-3">
+        <div class="card-header bg-warning text-dark">
+            <h6 class="mb-0"><i class="bi bi-gear-fill"></i> Mecânicas: O Que Você Precisa Saber</h6>
+        </div>
+        <div class="card-body">
+            <h6 class="text-primary mb-3">1. Produtos e Margens</h6>
+            <div class="table-responsive mb-4">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Produto</th>
+                            <th>O que considerar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>📱 <strong>Smartphone</strong></td>
+                            <td><small>Alto valor, mas consome MUITOS chips (3.5) e engenheiros</small></td>
+                        </tr>
+                        <tr>
+                            <td>💻 <strong>Laptop</strong></td>
+                            <td><small>Boa margem, consome chips moderadamente (2.8)</small></td>
+                        </tr>
+                        <tr>
+                            <td>🖥️ <strong>Desktop</strong></td>
+                            <td><small>MELHOR margem base (R$ 235), baixo consumo de chips (1.8)</small></td>
+                        </tr>
+                        <tr>
+                            <td>⌚ <strong>Smartwatch</strong></td>
+                            <td><small>Menor valor, mas consome muitos chips (2.8) - miniaturização!</small></td>
+                        </tr>
+                        <tr>
+                            <td>🖨️ <strong>Impressora</strong></td>
+                            <td><small>NÃO consome chips nem engenheiros - produto mecânico simples</small></td>
+                        </tr>
+                        <tr>
+                            <td>📷 <strong>Camera</strong></td>
+                            <td><small>Ótima margem (R$ 125), baixo consumo de chips (1.2)</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h6 class="text-danger mb-3">2. Recursos Limitados</h6>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="alert alert-light border">
+                        <strong>💰 Recursos com Custo Monetário:</strong>
+                        <ul class="small mb-0 mt-2">
+                            <li><strong>Matéria-Prima:</strong> R$ 1,20/unidade</li>
+                            <li><strong>Energia:</strong> R$ 0,65/kWh</li>
+                            <li><strong>Trabalhadores:</strong> R$ 22,00/hora</li>
+                        </ul>
+                        <p class="small text-muted mb-0 mt-2">Estes aparecem no custo de produção!</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-light border border-danger">
+                        <strong>⚠️ Recursos Físicos (sem custo, mas limitados):</strong>
+                        <ul class="small mb-0 mt-2">
+                            <li><strong>🔌 Chips:</strong> 1.800 disponíveis (ESCASSO!)</li>
+                            <li><strong>👨‍💻 Engenheiros:</strong> 350 horas (ESCASSO!)</li>
+                        </ul>
+                        <p class="small text-danger mb-0 mt-2">Atenção: Limitam a produção física!</p>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="text-success mb-3">3. Sinergias (Bônus de Lucro)</h6>
+            <div class="alert alert-success">
+                <p class="mb-2"><strong>💡 Conceito:</strong> Produzir produtos complementares juntos aumenta a margem!</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="border rounded p-2 bg-white">
+                            <strong>Ecossistema Móvel</strong> <span class="badge bg-success">+15%</span><br>
+                            <small>📱 Smartphone + ⌚ Smartwatch</small><br>
+                            <small class="text-muted">Min: 10 de cada</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-2 bg-white">
+                            <strong>Linha Computação</strong> <span class="badge bg-info">+10%</span><br>
+                            <small>🖥️ Desktop + 💻 Laptop</small><br>
+                            <small class="text-muted">Min: 10 de cada</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-2 bg-white">
+                            <strong>Fotografia Integrada</strong> <span class="badge bg-warning">+12%</span><br>
+                            <small>📷 Camera + 📱 Smartphone</small><br>
+                            <small class="text-muted">Min: 5 de cada</small>
+                        </div>
+                    </div>
+                </div>
+                <p class="small text-muted mb-0 mt-2">
+                    <i class="bi bi-info-circle"></i> O bônus é aplicado sobre a <strong>menor quantidade</strong> do par. 
+                    Exemplo: 50 Smartphones + 30 Smartwatches → Bônus em 30 unidades.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estratégias (sem spoilers) -->
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0"><i class="bi bi-compass"></i> Como Pensar Estrategicamente</h6>
+        </div>
+        <div class="card-body">
+            <h6 class="text-primary mb-3">Perguntas para se fazer ao decidir:</h6>
+            
+            <div class="accordion" id="accordionEstrategias">
+                <!-- Pergunta 1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#estrategia1">
+                            <i class="bi bi-1-circle me-2"></i> Qual produto tem a melhor margem?
+                        </button>
+                    </h2>
+                    <div id="estrategia1" class="accordion-collapse collapse" data-bs-parent="#accordionEstrategias">
+                        <div class="accordion-body">
+                            <p class="mb-2"><strong>💭 Pense nisso:</strong></p>
+                            <ul class="small">
+                                <li>Margem = Preço de Venda - Custo de Produção</li>
+                                <li>Produtos com maior margem geram mais lucro por unidade</li>
+                                <li>Mas cuidado: margens altas muitas vezes vêm com consumo alto de recursos escassos!</li>
+                                <li>Exemplo: Smartphone tem boa margem, mas consome 3.5 chips por unidade</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pergunta 2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#estrategia2">
+                            <i class="bi bi-2-circle me-2"></i> Quais recursos são os gargalos?
+                        </button>
+                    </h2>
+                    <div id="estrategia2" class="accordion-collapse collapse" data-bs-parent="#accordionEstrategias">
+                        <div class="accordion-body">
+                            <p class="mb-2"><strong>💭 Pense nisso:</strong></p>
+                            <ul class="small">
+                                <li><strong>Chips de Processamento:</strong> Apenas 1.800 disponíveis - recurso mais escasso!</li>
+                                <li><strong>Engenheiros Sênior:</strong> Apenas 350 horas - também limitado!</li>
+                                <li>Produtos eletrônicos complexos (Smartphone, Smartwatch, Laptop) consomem muito desses recursos</li>
+                                <li>Considere produtos que não dependem deles (Impressora não usa nenhum!)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pergunta 3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#estrategia3">
+                            <i class="bi bi-3-circle me-2"></i> Vale a pena buscar sinergias?
+                        </button>
+                    </h2>
+                    <div id="estrategia3" class="accordion-collapse collapse" data-bs-parent="#accordionEstrategias">
+                        <div class="accordion-body">
+                            <p class="mb-2"><strong>💭 Pense nisso:</strong></p>
+                            <ul class="small">
+                                <li>Sinergias dão bônus de 10%, 12% ou 15% sobre a margem</li>
+                                <li>Mas exigem produção <strong>balanceada</strong> (mínimo de cada produto)</li>
+                                <li><strong>Trade-off:</strong> Focar em um único produto de alta margem OU diversificar para ganhar sinergias?</li>
+                                <li>Exemplo: Vale mais produzir 100 Desktops OU 30 Desktops + 30 Laptops com +10%?</li>
+                                <li>Dica: Fotografia Integrada exige apenas 5 unidades (mais fácil de ativar!)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pergunta 4 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#estrategia4">
+                            <i class="bi bi-4-circle me-2"></i> Devo usar todos os recursos disponíveis?
+                        </button>
+                    </h2>
+                    <div id="estrategia4" class="accordion-collapse collapse" data-bs-parent="#accordionEstrategias">
+                        <div class="accordion-body">
+                            <p class="mb-2"><strong>💭 Pense nisso:</strong></p>
+                            <ul class="small">
+                                <li><strong>Não necessariamente!</strong> Maximizar lucro ≠ Usar 100% dos recursos</li>
+                                <li>Às vezes é melhor produzir menos de um produto caro e mais de um produto eficiente</li>
+                                <li>Foque em <strong>lucro total</strong>, não em utilização de recursos</li>
+                                <li>Recursos monetários (matéria, energia, trabalho) têm custo - usar demais pode reduzir lucro!</li>
+                                <li>Recursos físicos (chips, engenheiros) não têm custo, mas limitam o que você pode produzir</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pergunta 5 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#estrategia5">
+                            <i class="bi bi-5-circle me-2"></i> Como usar o Otimizador?
+                        </button>
+                    </h2>
+                    <div id="estrategia5" class="accordion-collapse collapse" data-bs-parent="#accordionEstrategias">
+                        <div class="accordion-body">
+                            <p class="mb-2"><strong>💭 Pense nisso:</strong></p>
+                            <ul class="small">
+                                <li>O botão "📊 Calcular Solução Ótima" usa programação linear para encontrar a melhor decisão</li>
+                                <li><strong>Use para aprender:</strong> Compare sua decisão com a solução ótima</li>
+                                <li>Analise <strong>por que</strong> o otimizador escolheu aqueles valores</li>
+                                <li>Você pode modificar a sugestão antes de confirmar</li>
+                                <li>Dica pedagógica: Tente primeiro manualmente, depois compare com o ótimo!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dicas Finais -->
+    <div class="card mb-0 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="bi bi-star-fill"></i> Dicas Importantes</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-success"><i class="bi bi-check-circle"></i> Faça:</h6>
+                    <ul class="small">
+                        <li>Analise o consumo de recursos em tempo real (cards coloridos)</li>
+                        <li>Veja o lucro estimado antes de confirmar</li>
+                        <li>Compare com o histórico de turnos anteriores</li>
+                        <li>Use os gráficos de evolução de recursos</li>
+                        <li>Experimente diferentes estratégias ao longo dos 12 turnos</li>
+                        <li>Leia o Modelo Matemático para entender a fundo</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-danger"><i class="bi bi-x-circle"></i> Evite:</h6>
+                    <ul class="small">
+                        <li>Confirmar decisão sem verificar violações de recursos</li>
+                        <li>Ignorar os recursos especializados (chips e engenheiros)</li>
+                        <li>Focar só em um produto sem considerar sinergias</li>
+                        <li>Esquecer que lucro = receita - custos (não é só vender!)</li>
+                        <li>Usar o otimizador sem tentar entender a solução</li>
+                        <li>Não aprender com os turnos anteriores</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mb-0 mt-3">
+                <i class="bi bi-trophy"></i> <strong>Objetivo Final:</strong> 
+                Maximizar o <strong>lucro acumulado</strong> ao longo dos 12 turnos. Não é sobre ganhar um turno, mas sim ter a melhor performance geral!
+            </div>
+        </div>
+    </div>
+</div>

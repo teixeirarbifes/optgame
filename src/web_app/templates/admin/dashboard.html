@@ -137,6 +137,11 @@
                         
                         <!-- Botões Administrativos - Sutis e Pequenos -->
                         <div class="col-auto">
+                            <button class="btn btn-outline-primary btn-sm" onclick="mostrarTutorial()" title="Tutorial do Jogo">
+                                <i class="bi bi-question-circle"></i> <small>Tutorial</small>
+                            </button>
+                        </div>
+                        <div class="col-auto">
                             <button class="btn btn-outline-info btn-sm" onclick="mostrarModeloMatematico()" title="Ver Modelo Matemático">
                                 <i class="bi bi-calculator"></i> <small>Modelo Matemático</small>
                             </button>
@@ -1825,7 +1830,32 @@
             $('#modelo-valores').show();
         }
     }
+    
+    // Função para mostrar modal do tutorial
+    function mostrarTutorial() {
+        $('#modalTutorial').modal('show');
+    }
 </script>
+
+<!-- Modal Tutorial -->
+<div class="modal fade" id="modalTutorial" tabindex="-1" aria-labelledby="modalTutorialLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalTutorialLabel">
+                    <i class="bi bi-question-circle"></i> Como Funciona o Jogo - Guia para Professores
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% include 'partials/tutorial.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal Modelo Matemático -->
 <div class="modal fade" id="modalModeloMatematico" tabindex="-1" aria-labelledby="modalModeloLabel" aria-hidden="true">

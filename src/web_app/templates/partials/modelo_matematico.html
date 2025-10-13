@@ -28,7 +28,8 @@
                     <li><code>V<sub>p</sub></code> = Preço de venda unitário do produto <em>p</em> <span class="badge bg-secondary">parâmetro</span></li>
                     <li><code>C<sub>p</sub></code> = Custo unitário de produção do produto <em>p</em> <span class="badge bg-secondary">parâmetro</span></li>
                     <li><code>M<sub>p</sub></code> = Margem unitária do produto <em>p</em> = <strong>(V<sub>p</sub> - C<sub>p</sub>)</strong></li>
-                    <li><code>$\bar{M}_i$</code> = Margem unitária <strong>média</strong> dos produtos no grupo <em>i</em> = <strong>$\frac{1}{|G_i|} \sum_{p \in G_i} M_p$</strong></li>
+                    <li><code>M̄<sub>i</sub></code> = Margem unitária <strong>média</strong> dos produtos no grupo <em>i</em> (M com barra superior)</li>
+                    <li style="margin-left: 20px; list-style: none;">Fórmula: $$ \bar{M}_i = \frac{1}{|G_i|} \sum_{p \in G_i} M_p $$</li>
                     <li><code>b<sub>i</sub></code> = Fator de bônus do grupo <em>i</em> (1.15, 1.10 ou 1.12) <span class="badge bg-secondary">parâmetro</span></li>
                 </ul>
             </div>
@@ -109,10 +110,10 @@
                             <li>Como estamos maximizando lucro, q<sub>i</sub> será automaticamente o mínimo</li>
                         </ul>
                     </li>
-                    <li><code>$\bar{M}_i$</code> = <strong>Margem unitária média</strong> dos produtos no grupo G<sub>i</sub>
+                    <li><code>M̄<sub>i</sub></code> = <strong>Margem unitária média</strong> dos produtos no grupo G<sub>i</sub> (M com barra superior)
                         <ul class="small text-muted">
-                            <li>Calculada como: $\bar{M}_i = \frac{1}{|G_i|} \sum_{p \in G_i} (V_p - C_p)$</li>
-                            <li>Exemplo: Se Smartphone tem margem R$ 60 e Smartwatch R$ 30, então $\bar{M} = \frac{60+30}{2} = 45$</li>
+                            <li>Calculada como: $$ \bar{M}_i = \frac{1}{|G_i|} \sum_{p \in G_i} (V_p - C_p) $$</li>
+                            <li>Exemplo: Se Smartphone tem margem R$ 60 e Smartwatch R$ 30, então M̄ = (60+30)/2 = 45</li>
                         </ul>
                     </li>
                     <li><code>b<sub>i</sub></code> = Fator de bônus (1.15, 1.10 ou 1.12)</li>
@@ -123,7 +124,7 @@
                     <strong>📐 Exemplo Prático:</strong><br>
                     Se produzir 50 Smartphones e 30 Smartwatches (Ecossistema Móvel, b = 1.15):<br>
                     • q<sub>1</sub> = MIN(50, 30) = 30 unidades<br>
-                    • $\bar{M}$ ≈ R$ 45 (média das margens)<br>
+                    • M̄ ≈ R$ 45 (média das margens)<br>
                     • Bônus = 30 × 45 × (1.15 - 1) = 30 × 45 × 0.15 = <strong>R$ 202,50</strong><br>
                     • O bônus é aplicado sobre as <strong>30 primeiras unidades</strong> (MIN) de cada produto do par
                 </div>
@@ -200,7 +201,7 @@
                 <div class="alert alert-warning mb-3">
                     <strong>📌 Notação Importante:</strong>
                     <ul class="mb-0 small">
-                        <li><strong>$\bar{M}_i$</strong> (M com barra) = Margem unitária <strong>média</strong> dos produtos no grupo de sinergia <em>i</em></li>
+                        <li><strong>M̄<sub>i</sub></strong> (M com barra superior) = Margem unitária <strong>média</strong> dos produtos no grupo de sinergia <em>i</em></li>
                         <li><strong>M<sub>p</sub></strong> (M sem barra) = Margem unitária do produto individual <em>p</em> = V<sub>p</sub> - C<sub>p</sub></li>
                         <li><strong>V<sub>p</sub></strong> = Preço de venda do produto <em>p</em></li>
                         <li><strong>C<sub>p</sub></strong> = Custo unitário do produto <em>p</em></li>
