@@ -327,12 +327,15 @@ class GameState:
             print(f"Recursos disponiveis: {recursos_disponiveis}")
             
             # Verificar recursos físicos (incluindo recursos especializados)
+            # Usar tolerância para evitar erros de arredondamento (ex: 600.0000001 > 600)
+            EPSILON = 1e-6
             recursos_fisicos = ['materia_prima', 'energia', 'trabalhadores', 'chips_processamento', 'engenheiros_senior']
             for recurso in recursos_fisicos:
                 necessario = consumo.get(recurso, 0)
                 disponivel = recursos_disponiveis.get(recurso, 0)
                 print(f"  {recurso}: necessario={necessario}, disponivel={disponivel}")
-                if necessario > disponivel:
+                # Só considera violação se exceder a capacidade por mais que EPSILON
+                if necessario > disponivel + EPSILON:
                     print(f"    VIOLACAO! Deficit: {necessario - disponivel}")
                     violacoes.append({
                         'recurso': recurso,

@@ -484,7 +484,8 @@
                                     Uso: <strong>{% if uso % 1 == 0 %}{{ "%.0f"|format(uso) }}{% else %}{{ "%.1f"|format(uso) }}{% endif %}</strong> / 
                                     Capacidade: <strong>{% if capacidade % 1 == 0 %}{{ "%.0f"|format(capacidade) }}{% else %}{{ "%.1f"|format(capacidade) }}{% endif %}</strong>
                                     {% set percentual = (uso / capacidade * 100) if capacidade > 0 else 0 %}
-                                    {% if percentual > 100 %}
+                                    {# Usar tolerância para evitar falsos positivos de violação (ex: 100.00001% > 100%) #}
+                                    {% if percentual > 100.01 %}
                                     <span class="badge bg-danger ms-1">VIOLAÇÃO!</span>
                                     {% endif %}
                                 </small>
