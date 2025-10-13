@@ -14,16 +14,22 @@
             <div class="math-formula p-3 bg-light border rounded">
                 <p class="mb-2"><strong>Maximizar:</strong></p>
                 <p class="text-center fs-5 mb-3">
-                    $$ \text{Lucro Total} = \sum_{p \in P} x_p \cdot (V_p - C_p) + \text{Bônus Sinergias} $$
+                    $$ Z = \sum_{p \in P} x_p \cdot M_p + \sum_{i=1}^{3} q_i \cdot \bar{M}_i \cdot (b_i - 1) $$
+                </p>
+                <p class="text-center small text-muted mb-3">
+                    (Lucro Base dos Produtos) + (Bônus das Sinergias)
                 </p>
                 <hr>
-                <p class="mb-1"><strong>Onde:</strong></p>
+                <p class="mb-1"><strong>Notação e Variáveis:</strong></p>
                 <ul class="mb-0">
                     <li><code>P</code> = Conjunto de produtos {Smartphone, Laptop, Desktop, Smartwatch, Impressora, Camera}</li>
-                    <li><code>x<sub>p</sub></code> = Quantidade a produzir do produto <em>p</em> (variável de decisão)</li>
-                    <li><code>V<sub>p</sub></code> = Preço de venda unitário do produto <em>p</em></li>
-                    <li><code>C<sub>p</sub></code> = Custo unitário de produção do produto <em>p</em></li>
-                    <li><strong>Margem Unitária:</strong> <code>M<sub>p</sub> = V<sub>p</sub> - C<sub>p</sub></code></li>
+                    <li><code>x<sub>p</sub></code> = Quantidade a produzir do produto <em>p</em> <span class="badge bg-primary">variável de decisão</span></li>
+                    <li><code>q<sub>i</sub></code> = Quantidade mínima do grupo de sinergia <em>i</em> <span class="badge bg-primary">variável auxiliar</span></li>
+                    <li><code>V<sub>p</sub></code> = Preço de venda unitário do produto <em>p</em> <span class="badge bg-secondary">parâmetro</span></li>
+                    <li><code>C<sub>p</sub></code> = Custo unitário de produção do produto <em>p</em> <span class="badge bg-secondary">parâmetro</span></li>
+                    <li><code>M<sub>p</sub></code> = Margem unitária do produto <em>p</em> = <strong>(V<sub>p</sub> - C<sub>p</sub>)</strong></li>
+                    <li><code>$\bar{M}_i$</code> = Margem unitária <strong>média</strong> dos produtos no grupo <em>i</em> = <strong>$\frac{1}{|G_i|} \sum_{p \in G_i} M_p$</strong></li>
+                    <li><code>b<sub>i</sub></code> = Fator de bônus do grupo <em>i</em> (1.15, 1.10 ou 1.12) <span class="badge bg-secondary">parâmetro</span></li>
                 </ul>
             </div>
             
@@ -82,12 +88,45 @@
             <h6 class="mb-0"><i class="bi bi-diagram-3"></i> Sinergias de Mercado (Bônus de Lucro)</h6>
         </div>
         <div class="card-body">
+            <div class="alert alert-info mb-3">
+                <strong>💡 Conceito:</strong> Sinergias recompensam a produção <em>balanceada</em> de produtos complementares. 
+                O bônus é calculado sobre a <strong>menor quantidade</strong> produzida do par (MIN).
+            </div>
+            
             <div class="math-formula p-3 bg-light border rounded">
-                <p class="mb-2"><strong>Para cada grupo de sinergia G<sub>i</sub>:</strong></p>
+                <p class="mb-2"><strong>Modelagem Matemática:</strong></p>
                 <p class="text-center fs-6 mb-3">
                     $$ q_i \leq x_p \quad \forall p \in G_i $$
-                    $$ \text{Bônus}_i = q_i \cdot M_{base} \cdot (b_i - 1) $$
+                    $$ \text{Bônus}_i = q_i \cdot \bar{M}_i \cdot (b_i - 1) $$
                 </p>
+                <hr>
+                <p class="mb-2"><strong>Onde:</strong></p>
+                <ul class="mb-3">
+                    <li><code>G<sub>i</sub></code> = Conjunto de produtos no grupo de sinergia <em>i</em> (exemplo: {Smartphone, Smartwatch})</li>
+                    <li><code>q<sub>i</sub></code> = Variável auxiliar que representa <strong>MIN(x<sub>p</sub>)</strong> para todos p ∈ G<sub>i</sub>
+                        <ul class="small text-muted">
+                            <li>O solver força q<sub>i</sub> ≤ x<sub>p</sub> para cada produto do grupo</li>
+                            <li>Como estamos maximizando lucro, q<sub>i</sub> será automaticamente o mínimo</li>
+                        </ul>
+                    </li>
+                    <li><code>$\bar{M}_i$</code> = <strong>Margem unitária média</strong> dos produtos no grupo G<sub>i</sub>
+                        <ul class="small text-muted">
+                            <li>Calculada como: $\bar{M}_i = \frac{1}{|G_i|} \sum_{p \in G_i} (V_p - C_p)$</li>
+                            <li>Exemplo: Se Smartphone tem margem R$ 60 e Smartwatch R$ 30, então $\bar{M} = \frac{60+30}{2} = 45$</li>
+                        </ul>
+                    </li>
+                    <li><code>b<sub>i</sub></code> = Fator de bônus (1.15, 1.10 ou 1.12)</li>
+                    <li><code>(b<sub>i</sub> - 1)</code> = Percentual de bônus adicional (0.15 = 15%, 0.10 = 10%, 0.12 = 12%)</li>
+                </ul>
+                
+                <div class="alert alert-success mb-0">
+                    <strong>📐 Exemplo Prático:</strong><br>
+                    Se produzir 50 Smartphones e 30 Smartwatches (Ecossistema Móvel, b = 1.15):<br>
+                    • q<sub>1</sub> = MIN(50, 30) = 30 unidades<br>
+                    • $\bar{M}$ ≈ R$ 45 (média das margens)<br>
+                    • Bônus = 30 × 45 × (1.15 - 1) = 30 × 45 × 0.15 = <strong>R$ 202,50</strong><br>
+                    • O bônus é aplicado sobre as <strong>30 primeiras unidades</strong> (MIN) de cada produto do par
+                </div>
                 <hr>
                 <p class="mb-2"><strong>Grupos de Sinergia Definidos:</strong></p>
                 <div class="row">
@@ -116,13 +155,6 @@
                         </div>
                     </div>
                 </div>
-                <p class="mb-1 mt-3"><strong>Onde:</strong></p>
-                <ul class="small mb-0">
-                    <li><code>q<sub>i</sub></code> = Variável auxiliar que representa a <strong>quantidade mínima</strong> produzida entre os produtos do grupo G<sub>i</sub></li>
-                    <li><code>M<sub>base</sub></code> = Margem unitária média dos produtos no grupo</li>
-                    <li><code>b<sub>i</sub></code> = Fator de bônus do grupo (1.15, 1.10 ou 1.12)</li>
-                    <li><strong>Lógica:</strong> O bônus é aplicado sobre a menor quantidade produzida do par (incentiva produção balanceada)</li>
-                </ul>
             </div>
         </div>
     </div>
@@ -152,12 +184,27 @@
         <div class="card-body">
             <div class="p-3 bg-light border rounded">
                 <p class="mb-2"><strong>Modelo Completo de Programação Linear:</strong></p>
-                <div class="text-center">
-                    <p class="mb-1">$$ \max Z = \sum_{p \in P} x_p \cdot (V_p - C_p) + \sum_{i=1}^{3} q_i \cdot M_{base,i} \cdot (b_i - 1) $$</p>
-                    <p class="mb-1 small text-muted">Sujeito a:</p>
-                    <p class="mb-1">$$ \sum_{p \in P} a_{pr} \cdot x_p \leq R_r \quad \forall r \in R $$</p>
-                    <p class="mb-1">$$ q_i \leq x_p \quad \forall p \in G_i, \forall i \in \{1, 2, 3\} $$</p>
-                    <p class="mb-0">$$ x_p \geq 0, \quad q_i \geq 0 $$</p>
+                <div class="text-center mb-3">
+                    <p class="mb-1"><strong>Maximizar:</strong></p>
+                    <p class="mb-1">$$ Z = \underbrace{\sum_{p \in P} x_p \cdot (V_p - C_p)}_{\text{Lucro Base}} + \underbrace{\sum_{i=1}^{3} q_i \cdot \bar{M}_i \cdot (b_i - 1)}_{\text{Bônus Sinergias}} $$</p>
+                    <p class="mb-3 small text-muted">
+                        = (Lucro dos produtos individuais) + (Bônus das sinergias sobre produção balanceada)
+                    </p>
+                    
+                    <p class="mb-1 small text-muted"><strong>Sujeito a:</strong></p>
+                    <p class="mb-1">$$ \sum_{p \in P} a_{pr} \cdot x_p \leq R_r \quad \forall r \in R \quad \text{(restrições de recursos)} $$</p>
+                    <p class="mb-1">$$ q_i \leq x_p \quad \forall p \in G_i, \forall i \in \{1, 2, 3\} \quad \text{(q}_i \text{ = MIN)} $$</p>
+                    <p class="mb-0">$$ x_p \geq 0, \quad q_i \geq 0 \quad \text{(não-negatividade)} $$</p>
+                </div>
+                
+                <div class="alert alert-warning mb-3">
+                    <strong>📌 Notação Importante:</strong>
+                    <ul class="mb-0 small">
+                        <li><strong>$\bar{M}_i$</strong> (M com barra) = Margem unitária <strong>média</strong> dos produtos no grupo de sinergia <em>i</em></li>
+                        <li><strong>M<sub>p</sub></strong> (M sem barra) = Margem unitária do produto individual <em>p</em> = V<sub>p</sub> - C<sub>p</sub></li>
+                        <li><strong>V<sub>p</sub></strong> = Preço de venda do produto <em>p</em></li>
+                        <li><strong>C<sub>p</sub></strong> = Custo unitário do produto <em>p</em></li>
+                    </ul>
                 </div>
                 <hr>
                 <p class="mb-2"><strong>Tipo de Problema:</strong></p>
