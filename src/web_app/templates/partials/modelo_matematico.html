@@ -1,0 +1,473 @@
+<!-- Modelo Matemático Genérico -->
+<div id="modelo-generico">
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> <strong>Sobre o Modelo:</strong> 
+        Este é um problema de <strong>Programação Linear</strong> que maximiza o lucro total sujeito a restrições de recursos.
+    </div>
+
+    <!-- Função Objetivo -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0"><i class="bi bi-bullseye"></i> Função Objetivo: Maximizar Lucro Total</h6>
+        </div>
+        <div class="card-body">
+            <div class="math-formula p-3 bg-light border rounded">
+                <p class="mb-2"><strong>Maximizar:</strong></p>
+                <p class="text-center fs-5 mb-3">
+                    $$ \text{Lucro Total} = \sum_{p \in P} x_p \cdot (V_p - C_p) + \text{Bônus Sinergias} $$
+                </p>
+                <hr>
+                <p class="mb-1"><strong>Onde:</strong></p>
+                <ul class="mb-0">
+                    <li><code>P</code> = Conjunto de produtos {Smartphone, Laptop, Desktop, Smartwatch, Impressora, Camera}</li>
+                    <li><code>x<sub>p</sub></code> = Quantidade a produzir do produto <em>p</em> (variável de decisão)</li>
+                    <li><code>V<sub>p</sub></code> = Preço de venda unitário do produto <em>p</em></li>
+                    <li><code>C<sub>p</sub></code> = Custo unitário de produção do produto <em>p</em></li>
+                    <li><strong>Margem Unitária:</strong> <code>M<sub>p</sub> = V<sub>p</sub> - C<sub>p</sub></code></li>
+                </ul>
+            </div>
+            
+            <!-- Cálculo do Custo Unitário -->
+            <div class="mt-3 p-3 bg-light border rounded">
+                <p class="mb-2"><strong>Custo Unitário de Produção:</strong></p>
+                <p class="text-center fs-6">
+                    $$ C_p = \sum_{r \in R_{custo}} a_{pr} \cdot c_r $$
+                </p>
+                <p class="mb-1 small text-muted">Onde:</p>
+                <ul class="small mb-0">
+                    <li><code>R<sub>custo</sub></code> = {materia_prima, energia, trabalhadores} (recursos com custo monetário)</li>
+                    <li><code>a<sub>pr</sub></code> = Quantidade do recurso <em>r</em> necessário para produzir 1 unidade do produto <em>p</em></li>
+                    <li><code>c<sub>r</sub></code> = Custo unitário do recurso <em>r</em></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restrições de Recursos -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h6 class="mb-0"><i class="bi bi-box-seam"></i> Restrições de Recursos (Capacidades)</h6>
+        </div>
+        <div class="card-body">
+            <div class="math-formula p-3 bg-light border rounded">
+                <p class="mb-2"><strong>Para cada recurso r ∈ R:</strong></p>
+                <p class="text-center fs-5 mb-3">
+                    $$ \sum_{p \in P} a_{pr} \cdot x_p \leq R_r $$
+                </p>
+                <hr>
+                <p class="mb-2"><strong>Recursos considerados (R):</strong></p>
+                <ol>
+                    <li><strong>💰 Dinheiro:</strong> Orçamento disponível para custos de produção
+                        <ul class="small">
+                            <li>Consumo = Soma dos custos de todos recursos para todos produtos</li>
+                        </ul>
+                    </li>
+                    <li><strong>📦 Matéria-Prima:</strong> Materiais necessários (kg, litros, etc.)</li>
+                    <li><strong>⚡ Energia:</strong> Consumo energético (kWh)</li>
+                    <li><strong>👥 Trabalhadores:</strong> Horas de trabalho disponíveis</li>
+                    <li><strong>🔌 Chips de Processamento:</strong> Componentes eletrônicos especializados</li>
+                    <li><strong>👨‍💻 Engenheiros Sênior:</strong> Horas de engenharia especializada</li>
+                </ol>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle"></i> <strong>Nota:</strong> Todos os recursos têm a mesma importância matemática como restrições. 
+                    Chips e Engenheiros não têm custo monetário direto (não aparecem no cálculo de C<sub>p</sub>), mas limitam fisicamente a produção.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sinergias (Trade-offs) -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="bi bi-diagram-3"></i> Sinergias de Mercado (Bônus de Lucro)</h6>
+        </div>
+        <div class="card-body">
+            <div class="math-formula p-3 bg-light border rounded">
+                <p class="mb-2"><strong>Para cada grupo de sinergia G<sub>i</sub>:</strong></p>
+                <p class="text-center fs-6 mb-3">
+                    $$ q_i \leq x_p \quad \forall p \in G_i $$
+                    $$ \text{Bônus}_i = q_i \cdot M_{base} \cdot (b_i - 1) $$
+                </p>
+                <hr>
+                <p class="mb-2"><strong>Grupos de Sinergia Definidos:</strong></p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <strong class="text-success">Ecossistema Móvel</strong>
+                            <span class="badge bg-success float-end">+15%</span>
+                            <br><small>📱 Smartphone + ⌚ Smartwatch</small>
+                            <br><small class="text-muted">Threshold: 10 unidades</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <strong class="text-info">Linha Computação</strong>
+                            <span class="badge bg-info float-end">+10%</span>
+                            <br><small>🖥️ Desktop + 💻 Laptop</small>
+                            <br><small class="text-muted">Threshold: 10 unidades</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-2 mb-2 bg-light">
+                            <strong class="text-warning">Fotografia Integrada</strong>
+                            <span class="badge bg-warning float-end">+12%</span>
+                            <br><small>📷 Camera + 📱 Smartphone</small>
+                            <br><small class="text-muted">Threshold: 5 unidades</small>
+                        </div>
+                    </div>
+                </div>
+                <p class="mb-1 mt-3"><strong>Onde:</strong></p>
+                <ul class="small mb-0">
+                    <li><code>q<sub>i</sub></code> = Variável auxiliar que representa a <strong>quantidade mínima</strong> produzida entre os produtos do grupo G<sub>i</sub></li>
+                    <li><code>M<sub>base</sub></code> = Margem unitária média dos produtos no grupo</li>
+                    <li><code>b<sub>i</sub></code> = Fator de bônus do grupo (1.15, 1.10 ou 1.12)</li>
+                    <li><strong>Lógica:</strong> O bônus é aplicado sobre a menor quantidade produzida do par (incentiva produção balanceada)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restrições de Não-Negatividade -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h6 class="mb-0"><i class="bi bi-check-circle"></i> Restrições de Não-Negatividade</h6>
+        </div>
+        <div class="card-body">
+            <div class="math-formula p-3 bg-light border rounded text-center">
+                <p class="fs-5 mb-2">
+                    $$ x_p \geq 0 \quad \forall p \in P $$
+                </p>
+                <p class="text-muted small mb-0">
+                    Não é possível produzir quantidades negativas de produtos.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo do Modelo -->
+    <div class="card mb-0 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="bi bi-journal-text"></i> Resumo Completo do Modelo</h6>
+        </div>
+        <div class="card-body">
+            <div class="p-3 bg-light border rounded">
+                <p class="mb-2"><strong>Modelo Completo de Programação Linear:</strong></p>
+                <div class="text-center">
+                    <p class="mb-1">$$ \max Z = \sum_{p \in P} x_p \cdot (V_p - C_p) + \sum_{i=1}^{3} q_i \cdot M_{base,i} \cdot (b_i - 1) $$</p>
+                    <p class="mb-1 small text-muted">Sujeito a:</p>
+                    <p class="mb-1">$$ \sum_{p \in P} a_{pr} \cdot x_p \leq R_r \quad \forall r \in R $$</p>
+                    <p class="mb-1">$$ q_i \leq x_p \quad \forall p \in G_i, \forall i \in \{1, 2, 3\} $$</p>
+                    <p class="mb-0">$$ x_p \geq 0, \quad q_i \geq 0 $$</p>
+                </div>
+                <hr>
+                <p class="mb-2"><strong>Tipo de Problema:</strong></p>
+                <ul class="mb-2">
+                    <li><strong>Classe:</strong> Programação Linear (LP)</li>
+                    <li><strong>Variáveis:</strong> 6 produtos + 3 variáveis auxiliares de sinergia = 9 variáveis</li>
+                    <li><strong>Restrições:</strong> 6 recursos + ~6 restrições de sinergia = ~12 restrições</li>
+                    <li><strong>Solver:</strong> PuLP (Python) com CBC ou GLPK</li>
+                </ul>
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle"></i> <strong>Solução Garantida:</strong> 
+                    Por ser um problema de programação linear, existe um algoritmo eficiente (Simplex) que garante encontrar a solução ótima global em tempo polinomial.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modelo com Valores Reais -->
+<div id="modelo-valores" style="display: none;">
+    <div class="alert alert-success">
+        <i class="bi bi-123"></i> <strong>Modelo com Valores Reais:</strong> 
+        Abaixo estão os parâmetros e constantes utilizados no jogo atual.
+    </div>
+
+    <!-- Parâmetros de Produtos -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0"><i class="bi bi-box"></i> Parâmetros dos Produtos</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Produto</th>
+                            <th class="text-end">Preço Venda (V<sub>p</sub>)</th>
+                            <th class="text-end">📦 Matéria</th>
+                            <th class="text-end">⚡ Energia</th>
+                            <th class="text-end">👥 Trabalho</th>
+                            <th class="text-end">🔌 Chips</th>
+                            <th class="text-end">👨‍💻 Eng.</th>
+                            <th class="text-end">Custo (C<sub>p</sub>)</th>
+                            <th class="text-end">Margem (M<sub>p</sub>)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if produtos %}
+                        {% for prod_key, prod_data in produtos.items() %}
+                        <tr>
+                            <td><strong>{{ prod_data.emoji }} {{ prod_key }}</strong></td>
+                            <td class="text-end">R$ {{ "%.2f"|format(prod_data.preco_venda) }}</td>
+                            <td class="text-end">{{ prod_data.consumo_materia }}</td>
+                            <td class="text-end">{{ prod_data.consumo_energia }}</td>
+                            <td class="text-end">{{ "%.2f"|format(prod_data.consumo_trabalhadores) }}</td>
+                            <td class="text-end">{{ "%.1f"|format(prod_data.consumo_chips_processamento) }}</td>
+                            <td class="text-end">{{ "%.1f"|format(prod_data.consumo_engenheiros_senior) }}</td>
+                            <td class="text-end">R$ {{ "%.2f"|format(prod_data.consumo_materia * 1.20 + prod_data.consumo_energia * 0.65 + prod_data.consumo_trabalhadores * 22.00) }}</td>
+                            <td class="text-end text-success fw-bold">R$ {{ "%.2f"|format(prod_data.preco_venda - (prod_data.consumo_materia * 1.20 + prod_data.consumo_energia * 0.65 + prod_data.consumo_trabalhadores * 22.00)) }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="small text-muted mb-0 mt-2">
+                <i class="bi bi-info-circle"></i> <strong>Custos Unitários:</strong> 
+                Matéria-prima = R$ 1,20/un | Energia = R$ 0,65/kWh | Trabalhadores = R$ 22,00/h
+            </p>
+        </div>
+    </div>
+
+    <!-- Capacidades de Recursos -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h6 class="mb-0"><i class="bi bi-battery-half"></i> Capacidades de Recursos (R<sub>r</sub>)</h6>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                {% if recursos_base %}
+                <div class="col-md-2">
+                    <div class="p-3 border rounded bg-light">
+                        <h5 class="mb-1">💰</h5>
+                        <p class="mb-1 fw-bold">R$ {{ "{:,.0f}".format(recursos_base.dinheiro) }}</p>
+                        <small class="text-muted">Dinheiro</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-3 border rounded bg-light">
+                        <h5 class="mb-1">📦</h5>
+                        <p class="mb-1 fw-bold">{{ "{:,.0f}".format(recursos_base.materia_prima) }}</p>
+                        <small class="text-muted">Matéria-Prima</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-3 border rounded bg-light">
+                        <h5 class="mb-1">⚡</h5>
+                        <p class="mb-1 fw-bold">{{ "{:,.0f}".format(recursos_base.energia) }}</p>
+                        <small class="text-muted">Energia (kWh)</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-3 border rounded bg-light">
+                        <h5 class="mb-1">👥</h5>
+                        <p class="mb-1 fw-bold">{{ "{:,.0f}".format(recursos_base.trabalhadores) }}</p>
+                        <small class="text-muted">Horas Trabalho</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-3 border rounded bg-light">
+                        <h5 class="mb-1">🔌</h5>
+                        <p class="mb-1 fw-bold">{{ "{:,.0f}".format(recursos_base.chips_processamento) }}</p>
+                        <small class="text-muted">Chips Processamento</small>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="p-3 border rounded bg-light">
+                        <h5 class="mb-1">👨‍💻</h5>
+                        <p class="mb-1 fw-bold">{{ "{:,.0f}".format(recursos_base.engenheiros_senior) }}</p>
+                        <small class="text-muted">Engenheiros Sênior</small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Função Objetivo Explícita -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0"><i class="bi bi-calculator"></i> Função Objetivo (Explícita)</h6>
+        </div>
+        <div class="card-body">
+            <div class="p-3 bg-light border rounded">
+                <p class="mb-2"><strong>Maximizar:</strong></p>
+                <div style="font-size: 0.9rem; overflow-x: auto;">
+                    <p class="mb-1">$$ Z = $$</p>
+                    {% if produtos %}
+                    {% for prod_key, prod_data in produtos.items() %}
+                    {% set margem = prod_data.preco_venda - (prod_data.consumo_materia * 1.20 + prod_data.consumo_energia * 0.65 + prod_data.consumo_trabalhadores * 22.00) %}
+                    <p class="mb-1 ms-3">
+                        $$ {{ "+" if not loop.first else "" }} {{ "%.2f"|format(margem) }} \cdot x_{\text{ {{- prod_key -}} }} $$
+                    </p>
+                    {% endfor %}
+                    {% endif %}
+                    <p class="mb-1 ms-3">$$ + q_1 \cdot M_{móvel} \cdot 0.15 \quad \text{(Ecossistema Móvel)} $$</p>
+                    <p class="mb-1 ms-3">$$ + q_2 \cdot M_{comp} \cdot 0.10 \quad \text{(Linha Computação)} $$</p>
+                    <p class="mb-0 ms-3">$$ + q_3 \cdot M_{foto} \cdot 0.12 \quad \text{(Fotografia Integrada)} $$</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restrições Explícitas -->
+    <div class="card mb-0">
+        <div class="card-header bg-danger text-white">
+            <h6 class="mb-0"><i class="bi bi-shield-check"></i> Restrições (Explícitas)</h6>
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="accordionRestricoes">
+                <!-- Matéria-Prima -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMateriaRecurso">
+                            📦 Matéria-Prima ≤ {{ "{:,.0f}".format(recursos_base.materia_prima) if recursos_base else "20,000" }}
+                        </button>
+                    </h2>
+                    <div id="collapseMateriaRecurso" class="accordion-collapse collapse" data-bs-parent="#accordionRestricoes">
+                        <div class="accordion-body">
+                            <p class="small">
+                                {% if produtos %}
+                                {% for prod_key, prod_data in produtos.items() %}
+                                {{ "+" if not loop.first else "" }} {{ prod_data.consumo_materia }} x<sub>{{ prod_key }}</sub>
+                                {% endfor %}
+                                ≤ {{ "{:,.0f}".format(recursos_base.materia_prima) if recursos_base else "20,000" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Energia -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEnergiaRecurso">
+                            ⚡ Energia ≤ {{ "{:,.0f}".format(recursos_base.energia) if recursos_base else "15,000" }} kWh
+                        </button>
+                    </h2>
+                    <div id="collapseEnergiaRecurso" class="accordion-collapse collapse" data-bs-parent="#accordionRestricoes">
+                        <div class="accordion-body">
+                            <p class="small">
+                                {% if produtos %}
+                                {% for prod_key, prod_data in produtos.items() %}
+                                {{ "+" if not loop.first else "" }} {{ prod_data.consumo_energia }} x<sub>{{ prod_key }}</sub>
+                                {% endfor %}
+                                ≤ {{ "{:,.0f}".format(recursos_base.energia) if recursos_base else "15,000" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trabalhadores -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTrabRecurso">
+                            👥 Trabalhadores ≤ {{ "{:,.0f}".format(recursos_base.trabalhadores) if recursos_base else "600" }} h
+                        </button>
+                    </h2>
+                    <div id="collapseTrabRecurso" class="accordion-collapse collapse" data-bs-parent="#accordionRestricoes">
+                        <div class="accordion-body">
+                            <p class="small">
+                                {% if produtos %}
+                                {% for prod_key, prod_data in produtos.items() %}
+                                {{ "+" if not loop.first else "" }} {{ "%.2f"|format(prod_data.consumo_trabalhadores) }} x<sub>{{ prod_key }}</sub>
+                                {% endfor %}
+                                ≤ {{ "{:,.0f}".format(recursos_base.trabalhadores) if recursos_base else "600" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chips -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseChipsRecurso">
+                            🔌 Chips de Processamento ≤ {{ "{:,.0f}".format(recursos_base.chips_processamento) if recursos_base else "1,800" }}
+                        </button>
+                    </h2>
+                    <div id="collapseChipsRecurso" class="accordion-collapse collapse" data-bs-parent="#accordionRestricoes">
+                        <div class="accordion-body">
+                            <p class="small">
+                                {% if produtos %}
+                                {% for prod_key, prod_data in produtos.items() %}
+                                {% if prod_data.consumo_chips_processamento > 0 %}
+                                {{ "+" if not loop.first else "" }} {{ "%.1f"|format(prod_data.consumo_chips_processamento) }} x<sub>{{ prod_key }}</sub>
+                                {% endif %}
+                                {% endfor %}
+                                ≤ {{ "{:,.0f}".format(recursos_base.chips_processamento) if recursos_base else "1,800" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Engenheiros -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEngRecurso">
+                            👨‍💻 Engenheiros Sênior ≤ {{ "{:,.0f}".format(recursos_base.engenheiros_senior) if recursos_base else "350" }} h
+                        </button>
+                    </h2>
+                    <div id="collapseEngRecurso" class="accordion-collapse collapse" data-bs-parent="#accordionRestricoes">
+                        <div class="accordion-body">
+                            <p class="small">
+                                {% if produtos %}
+                                {% for prod_key, prod_data in produtos.items() %}
+                                {% if prod_data.consumo_engenheiros_senior > 0 %}
+                                {{ "+" if not loop.first else "" }} {{ "%.1f"|format(prod_data.consumo_engenheiros_senior) }} x<sub>{{ prod_key }}</sub>
+                                {% endif %}
+                                {% endfor %}
+                                ≤ {{ "{:,.0f}".format(recursos_base.engenheiros_senior) if recursos_base else "350" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sinergias -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSinergias">
+                            🔗 Restrições de Sinergias (MIN entre produtos)
+                        </button>
+                    </h2>
+                    <div id="collapseSinergias" class="accordion-collapse collapse" data-bs-parent="#accordionRestricoes">
+                        <div class="accordion-body">
+                            <p class="mb-2"><strong>Ecossistema Móvel (q<sub>1</sub>):</strong></p>
+                            <p class="small mb-2 ms-3">
+                                q<sub>1</sub> ≤ x<sub>Smartphone</sub><br>
+                                q<sub>1</sub> ≤ x<sub>Smartwatch</sub>
+                            </p>
+                            
+                            <p class="mb-2"><strong>Linha Computação (q<sub>2</sub>):</strong></p>
+                            <p class="small mb-2 ms-3">
+                                q<sub>2</sub> ≤ x<sub>Desktop</sub><br>
+                                q<sub>2</sub> ≤ x<sub>Laptop</sub>
+                            </p>
+                            
+                            <p class="mb-2"><strong>Fotografia Integrada (q<sub>3</sub>):</strong></p>
+                            <p class="small mb-0 ms-3">
+                                q<sub>3</sub> ≤ x<sub>Camera</sub><br>
+                                q<sub>3</sub> ≤ x<sub>Smartphone</sub>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KaTeX para renderização de fórmulas -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" 
+    onload="renderMathInElement(document.body, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ]
+    });"></script>

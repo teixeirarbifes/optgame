@@ -15,6 +15,7 @@ class GameState:
         self.session_version = 1  # Incrementa quando sessões devem ser invalidadas
         self.auto_save_enabled = False  # Auto-save após cada iteração
         self.calcular_otimo_ao_criar = False  # Calcular solução ótima ao criar empresa (padrão: False)
+        self.modelo_default = None  # Modelo default para novas empresas (otimizador inverso)
         self.reset_game()
         
     def reset_game(self):
@@ -25,7 +26,7 @@ class GameState:
         self.iteracao_aberta = True  # Alunos podem enviar decisões
         self.historico_global: List[dict] = []
         self.produtos = GameConfig.get_produtos_inicializados()
-        # Não resetar a senha admin
+        # Não resetar a senha admin nem modelo_default
     
     def resetar_progresso(self):
         """Resetar apenas o progresso do jogo (mantém empresas cadastradas)
@@ -58,7 +59,9 @@ class GameState:
                 'dinheiro': [],
                 'materia_prima': [],
                 'energia': [],
-                'trabalhadores': []
+                'trabalhadores': [],
+                'chips_processamento': [],
+                'engenheiros_senior': []
             }
             empresa['lucro_total'] = 0
             empresa['lucro_ultimo_turno'] = 0
@@ -77,14 +80,24 @@ class GameState:
         """Adicionar nova empresa ao jogo"""
         if nome in self.empresas:
             return False
+        
+        # Determinar recursos base (usar modelo default se disponível)
+        if self.modelo_default and self.modelo_default.get('ativo', False):
+            recursos_base = self.modelo_default['recursos_base'].copy()
+            decisao_inicial = self.modelo_default.get('producao_sugerida', {}).copy()
+            custos_customizados = self.modelo_default.get('custos_produtos_otimizados')
+        else:
+            recursos_base = GameConfig.RECURSOS_BASE.copy()
+            decisao_inicial = {}
+            custos_customizados = None
             
         self.empresas[nome] = {
             'nome': nome,
             'equipe': equipe,
             'senha': senha,
-            'recursos_base': GameConfig.RECURSOS_BASE.copy(),  # Recursos iniciais (não mudam)
-            'recursos_disponiveis': GameConfig.RECURSOS_BASE.copy(),  # Recursos disponíveis (sempre resetam ao base)
-            'decisao_atual': {},  # Decisão pendente da iteração atual
+            'recursos_base': recursos_base,  # Recursos iniciais (não mudam)
+            'recursos_disponiveis': recursos_base.copy(),  # Recursos disponíveis (sempre resetam ao base)
+            'decisao_atual': decisao_inicial,  # Decisão pendente da iteração atual (pode ter sugestão do modelo)
             'decisao_confirmada': False,  # Se já confirmou a decisão
             'historico': [],  # Histórico completo com violações
             'historico_decisoes': [],
@@ -94,6 +107,8 @@ class GameState:
                 'materia_prima': [],
                 'energia': [],
                 'trabalhadores': [],
+                'chips_processamento': [],
+                'engenheiros_senior': []
             },
             'lucro_total': 0,
             'lucro_ultimo_turno': 0,
@@ -101,7 +116,9 @@ class GameState:
             'criada_em': datetime.now().isoformat(),
             'solucao_otima': None,  # Solução ótima calculada (guardada, não mostrada)
             'lucro_otimo': 0,  # Lucro máximo possível
-            'gap_percentual': None  # GAP% entre lucro atual e ótimo
+            'gap_percentual': None,  # GAP% entre lucro atual e ótimo
+            'modelo_aplicado': self.modelo_default if self.modelo_default and self.modelo_default.get('ativo') else None,  # Modelo usado na criação
+            'produtos_customizados': custos_customizados.copy() if custos_customizados else None  # Custos de produtos customizados
         }
         
         # Calcular solução ótima automaticamente se flag ativada
@@ -117,9 +134,15 @@ class GameState:
             return False
         return empresa['senha'] == senha
         
-    def registrar_decisao(self, nome_empresa: str, decisoes: Dict[str, int]) -> bool:
-        """Registrar decisão de produção da empresa"""
-        if not self.iteracao_aberta:
+    def registrar_decisao(self, nome_empresa: str, decisoes: Dict[str, float], force: bool = False) -> bool:
+        """Registrar decisão de produção da empresa
+        
+        Args:
+            nome_empresa: Nome da empresa
+            decisoes: Dicionário com decisões de produção (valores podem ser decimais)
+            force: Se True, ignora verificação de iteracao_aberta (para admin aplicar solução ótima)
+        """
+        if not force and not self.iteracao_aberta:
             return False
             
         empresa = self.empresas.get(nome_empresa)
@@ -134,12 +157,20 @@ class GameState:
         empresa['decisao_confirmada'] = True
         return True
         
-    def _validar_decisoes(self, empresa: dict, decisoes: Dict[str, int]) -> bool:
+    def _validar_decisoes(self, empresa: dict, decisoes: Dict[str, float]) -> bool:
         """Validar se as decisões são viáveis com recursos disponíveis"""
         from mecanicas.mechanics import GameMechanics
         
-        # Calcular consumo
-        consumo = GameMechanics.calcular_consumo_recursos(self.produtos, decisoes)
+        # Usar produtos customizados se disponíveis para esta empresa
+        produtos_para_calculo = self.produtos.copy()
+        if empresa.get('produtos_customizados'):
+            # Sobrescrever com custos customizados
+            for produto, custos_custom in empresa['produtos_customizados'].items():
+                if produto in produtos_para_calculo:
+                    produtos_para_calculo[produto].update(custos_custom)
+        
+        # Calcular consumo com produtos (possivelmente customizados)
+        consumo = GameMechanics.calcular_consumo_recursos(produtos_para_calculo, decisoes)
         recursos = empresa['recursos_disponiveis']
         
         # Verificar se tem recursos suficientes
@@ -149,6 +180,79 @@ class GameState:
                 return False
                 
         return True
+    
+    def _calcular_trade_offs_decisao(self, decisoes: Dict[str, float], produtos: Dict) -> Dict:
+        """Calcular trade-offs ativados por uma decisão (simplificado para dashboard)"""
+        trade_offs = {
+            'sinergias_ativas': [],
+            'recursos_especializados': {}
+        }
+        
+        # Definição de sinergias (mesmas do otimizador)
+        grupos_sinergia = [
+            {
+                'produtos': ['Smartphone', 'Smartwatch'],
+                'bonus': 1.15,
+                'threshold_min': 10,
+                'descricao': 'Ecossistema Móvel'
+            },
+            {
+                'produtos': ['Desktop', 'Laptop'],
+                'bonus': 1.10,
+                'threshold_min': 10,
+                'descricao': 'Linha de Computação'
+            },
+            {
+                'produtos': ['Camera', 'Smartphone'],
+                'bonus': 1.12,
+                'threshold_min': 5,
+                'descricao': 'Fotografia Integrada'
+            }
+        ]
+        
+        # Verificar sinergias ativas
+        for grupo in grupos_sinergia:
+            produtos_do_grupo = [p for p in grupo['produtos'] if decisoes.get(p, 0) >= grupo['threshold_min']]
+            if len(produtos_do_grupo) >= 2:
+                trade_offs['sinergias_ativas'].append({
+                    'produtos': produtos_do_grupo,
+                    'bonus': grupo['bonus'],
+                    'descricao': grupo['descricao'],
+                    'beneficio': f"+{(grupo['bonus']-1)*100:.1f}% margem"
+                })
+        
+        # Calcular uso de recursos especializados (agora vem direto do GameConfig)
+        # Chips de Processamento
+        consumo_chips = sum([
+            decisoes.get(produto, 0) * produtos.get(produto, {}).get('consumo_chips_processamento', 0)
+            for produto in decisoes.keys()
+        ])
+        if consumo_chips > 0:
+            trade_offs['recursos_especializados']['chips_processamento'] = {
+                'nome': GameConfig.NOMES_RECURSOS['chips_processamento'],
+                'emoji': GameConfig.EMOJI_RECURSO['chips_processamento'],
+                'consumo': round(consumo_chips, 2),
+                'capacidade': GameConfig.RECURSOS_BASE['chips_processamento'],
+                'utilizacao_percentual': round((consumo_chips / GameConfig.RECURSOS_BASE['chips_processamento']) * 100, 1),
+                'disponivel': round(GameConfig.RECURSOS_BASE['chips_processamento'] - consumo_chips, 2)
+            }
+        
+        # Engenheiros Sênior
+        consumo_engenheiros = sum([
+            decisoes.get(produto, 0) * produtos.get(produto, {}).get('consumo_engenheiros_senior', 0)
+            for produto in decisoes.keys()
+        ])
+        if consumo_engenheiros > 0:
+            trade_offs['recursos_especializados']['engenheiros_senior'] = {
+                'nome': GameConfig.NOMES_RECURSOS['engenheiros_senior'],
+                'emoji': GameConfig.EMOJI_RECURSO['engenheiros_senior'],
+                'consumo': round(consumo_engenheiros, 2),
+                'capacidade': GameConfig.RECURSOS_BASE['engenheiros_senior'],
+                'utilizacao_percentual': round((consumo_engenheiros / GameConfig.RECURSOS_BASE['engenheiros_senior']) * 100, 1),
+                'disponivel': round(GameConfig.RECURSOS_BASE['engenheiros_senior'] - consumo_engenheiros, 2)
+            }
+        
+        return trade_offs
         
     def processar_turno(self) -> Dict[str, any]:
         """Processar turno (chamado pelo admin)"""
@@ -196,9 +300,17 @@ class GameState:
                 
             decisoes = empresa['decisao_atual']
             
+            # Usar produtos customizados se disponíveis para esta empresa
+            produtos_para_calculo = self.produtos.copy()
+            if empresa.get('produtos_customizados'):
+                # Sobrescrever com custos customizados
+                for produto, custos_custom in empresa['produtos_customizados'].items():
+                    if produto in produtos_para_calculo:
+                        produtos_para_calculo[produto].update(custos_custom)
+            
             # Calcular consumo de recursos e métricas
-            consumo = GameMechanics.calcular_consumo_recursos(self.produtos, decisoes)
-            metricas = GameMechanics.calcular_metricas_plano(self.produtos, decisoes)
+            consumo = GameMechanics.calcular_consumo_recursos(produtos_para_calculo, decisoes)
+            metricas = GameMechanics.calcular_metricas_plano(produtos_para_calculo, decisoes)
             
             receita_total = metricas['receita']
             custo_total = metricas['custo']
@@ -214,8 +326,8 @@ class GameState:
             print(f"Consumo calculado: {consumo}")
             print(f"Recursos disponiveis: {recursos_disponiveis}")
             
-            # Verificar recursos físicos
-            recursos_fisicos = ['materia_prima', 'energia', 'trabalhadores']
+            # Verificar recursos físicos (incluindo recursos especializados)
+            recursos_fisicos = ['materia_prima', 'energia', 'trabalhadores', 'chips_processamento', 'engenheiros_senior']
             for recurso in recursos_fisicos:
                 necessario = consumo.get(recurso, 0)
                 disponivel = recursos_disponiveis.get(recurso, 0)
@@ -240,6 +352,7 @@ class GameState:
                 })
             
             # Se há violações, não executa e lucro = 0
+            trade_offs_info = None
             if violacoes:
                 lucro_turno = 0
                 receita_total = 0
@@ -266,7 +379,7 @@ class GameState:
                 detalhes = []
                 for produto, quantidade in decisoes.items():
                     if quantidade > 0:
-                        dados_produto = self.produtos.get(produto, {})
+                        dados_produto = produtos_para_calculo.get(produto, {})
                         receita_prod = quantidade * dados_produto.get('preco_venda', 0)
                         custo_prod = quantidade * dados_produto.get('custo_dinheiro', 0)
                         lucro_prod = receita_prod - custo_prod
@@ -277,9 +390,12 @@ class GameState:
                             'custo': custo_prod,
                             'lucro': lucro_prod
                         })
+                
+                # CALCULAR TRADE-OFFS para mostrar no dashboard
+                trade_offs_info = self._calcular_trade_offs_decisao(decisoes, produtos_para_calculo)
             
             # Adicionar ao histórico simplificado para o dashboard
-            empresa.setdefault('historico', []).append({
+            historico_entry = {
                 'turno': self.iteracao_atual,
                 'decisao': decisoes.copy(),
                 'receita': receita_total,
@@ -288,7 +404,13 @@ class GameState:
                 'consumo': consumo.copy(),
                 'violacoes': violacoes if violacoes else None,
                 'recursos_apos': empresa['recursos_disponiveis'].copy()
-            })
+            }
+            
+            # Adicionar trade-offs ao histórico se houver
+            if trade_offs_info:
+                historico_entry['trade_offs'] = trade_offs_info
+            
+            empresa.setdefault('historico', []).append(historico_entry)
             
             # Registrar histórico de recursos para gráficos
             empresa.setdefault('historico_recursos', {
@@ -296,13 +418,17 @@ class GameState:
                 'dinheiro': [],
                 'materia_prima': [],
                 'energia': [],
-                'trabalhadores': []
+                'trabalhadores': [],
+                'chips_processamento': [],
+                'engenheiros_senior': []
             })
             empresa['historico_recursos']['turnos'].append(self.iteracao_atual)
             empresa['historico_recursos']['dinheiro'].append(empresa['recursos_disponiveis']['dinheiro'])
             empresa['historico_recursos']['materia_prima'].append(empresa['recursos_disponiveis']['materia_prima'])
             empresa['historico_recursos']['energia'].append(empresa['recursos_disponiveis']['energia'])
             empresa['historico_recursos']['trabalhadores'].append(empresa['recursos_disponiveis']['trabalhadores'])
+            empresa['historico_recursos']['chips_processamento'].append(empresa['recursos_disponiveis']['chips_processamento'])
+            empresa['historico_recursos']['engenheiros_senior'].append(empresa['recursos_disponiveis']['engenheiros_senior'])
             
             # Lucro do último turno (NÃO acumulado)
             empresa['lucro_ultimo_turno'] = lucro_turno
@@ -553,8 +679,18 @@ class GameState:
             print(f"\n[CALCULAR OTIMO] {nome_empresa}")
             print(f"  Recursos usados para otimização: {recursos}")
             
+            # Usar produtos customizados se disponíveis para esta empresa
+            produtos_para_otimizacao = self.produtos.copy()
+            if empresa.get('produtos_customizados'):
+                print(f"  Usando custos customizados para {nome_empresa}")
+                # Sobrescrever com custos customizados
+                for produto, custos_custom in empresa['produtos_customizados'].items():
+                    if produto in produtos_para_otimizacao:
+                        produtos_para_otimizacao[produto].update(custos_custom)
+                        print(f"    {produto}: {custos_custom}")
+            
             optimizer = ProductionOptimizer()
-            resultado = optimizer.otimizar_producao(recursos)
+            resultado = optimizer.otimizar_producao(recursos, produtos_customizados=produtos_para_otimizacao)
             
             # Guardar solução ótima na empresa (SEM MOSTRAR NA TELA)
             if resultado.get('sucesso'):
@@ -661,22 +797,23 @@ class GameState:
             # Encontrar o produto correspondente
             decisoes[produto_completo] = quantidade
         
-        # Aplicar decisões E CONFIRMAR
-        sucesso = self.registrar_decisao(nome_empresa, decisoes)
+        # Aplicar diretamente SEM VALIDAÇÃO (a solução ótima já é válida por definição)
+        empresa = self.empresas[nome_empresa]
         
-        if sucesso:
-            return {
-                'sucesso': True,
-                'mensagem': f'Solução ótima aplicada e confirmada para {nome_empresa}!',
-                'producao_otima': producao_otima,
-                'lucro_esperado': resultado_otimizacao['lucro_esperado'],
-                'detalhes': resultado_otimizacao['detalhes']
-            }
-        else:
-            return {
-                'sucesso': False,
-                'mensagem': 'Erro ao aplicar solução ótima como decisão'
-            }
+        # Reset recursos_disponiveis para recursos_base
+        empresa['recursos_disponiveis'] = empresa['recursos_base'].copy()
+        
+        # Aplicar decisões diretamente E CONFIRMAR AUTOMATICAMENTE
+        empresa['decisao_atual'] = decisoes
+        empresa['decisao_confirmada'] = True  # Confirmada automaticamente pelo admin
+        
+        return {
+            'sucesso': True,
+            'mensagem': f'Solução ótima aplicada e confirmada automaticamente para {nome_empresa}!',
+            'producao_otima': producao_otima,
+            'lucro_esperado': resultado_otimizacao['lucro_esperado'],
+            'detalhes': resultado_otimizacao['detalhes']
+        }
     
     def _calcular_e_guardar_otimo(self, nome_empresa: str) -> bool:
         """Calcular e guardar solução ótima internamente (método auxiliar privado)

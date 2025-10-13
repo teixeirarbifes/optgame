@@ -232,14 +232,14 @@
                                     <input type="range" class="form-range produto-slider" 
                                            id="slider_{{ loop.index }}" 
                                            data-produto="{{ produto }}"
-                                           min="0" max="1000" value="{{ empresa.decisao_atual.get(produto, 0) }}" step="1">
+                                           min="0" max="1000" value="{{ empresa.decisao_atual.get(produto, 0) }}" step="0.01">
                                 </div>
                                 <div class="col-4">
                                     <input type="number" class="form-control produto-input" 
                                            id="input_{{ loop.index }}"
                                            name="produto_{{ produto }}"
                                            data-produto="{{ produto }}"
-                                           min="0" max="10000" value="{{ empresa.decisao_atual.get(produto, 0) }}">
+                                           min="0" max="10000" step="0.01" value="{{ empresa.decisao_atual.get(produto, 0) }}">
                                 </div>
                             </div>
                             <small class="text-muted">
@@ -455,7 +455,7 @@
                         </div>
                         {% endif %}
                         
-                        {% for recurso in ['dinheiro', 'materia_prima', 'energia', 'trabalhadores'] %}
+                        {% for recurso in ['dinheiro', 'materia_prima', 'energia', 'trabalhadores', 'chips_processamento', 'engenheiros_senior'] %}
                         <div class="mb-3">
                             {% set capacidade = empresa.recursos_base.get(recurso, 0) %}
                             {% set uso = ultimo_consumo.get(recurso, 0) %}
@@ -467,6 +467,8 @@
                                     {% elif recurso == 'materia_prima' %}📦 Matéria-Prima
                                     {% elif recurso == 'energia' %}⚡ Energia
                                     {% elif recurso == 'trabalhadores' %}👥 Trabalhadores
+                                    {% elif recurso == 'chips_processamento' %}🔌 Chips de Processamento
+                                    {% elif recurso == 'engenheiros_senior' %}👨‍💻 Engenheiros Sênior
                                     {% endif %}
                                 </small>
                                 <small>
@@ -499,7 +501,7 @@
                                     <tr>
                                         <th>Recurso</th>
                                         <th class="text-end">Custo Unitário</th>
-                                        <th class="text-center">Unidade</th>
+                                        <th class="text-center">Tipo</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -518,11 +520,22 @@
                                         <td class="text-end fw-bold">R$ 25,00</td>
                                         <td class="text-center">por hora-trab</td>
                                     </tr>
+                                    <tr class="table-info">
+                                        <td>🔌 Chips de Processamento</td>
+                                        <td class="text-end text-muted"><em>Sem custo direto</em></td>
+                                        <td class="text-center"><span class="badge bg-info">Restrição</span></td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td>👨‍💻 Engenheiros Sênior</td>
+                                        <td class="text-end text-muted"><em>Sem custo direto</em></td>
+                                        <td class="text-center"><span class="badge bg-info">Restrição</span></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="alert alert-info mb-0">
                             <small><i class="bi bi-calculator"></i> <strong>Calcule você mesmo:</strong> Custo Total = (Consumo Matéria × R$1,50) + (Consumo Energia × R$0,80) + (Consumo Trab × R$25,00)</small>
+                            <small class="d-block mt-2"><i class="bi bi-exclamation-circle"></i> <strong>Recursos Especializados:</strong> São limitações de capacidade compartilhada entre produtos. Não geram custos diretos, mas exceder os limites invalida sua decisão!</small>
                         </div>
                     </div>
                     
@@ -538,6 +551,8 @@
                                         <th class="text-center">📦</th>
                                         <th class="text-center">⚡</th>
                                         <th class="text-center">👥</th>
+                                        <th class="text-center">🔌</th>
+                                        <th class="text-center">👨‍💻</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -548,12 +563,112 @@
                                         <td class="text-center">{{ dados.get('consumo_materia', dados.get('custo_materia', 0)) }}</td>
                                         <td class="text-center">{{ dados.get('consumo_energia', dados.get('custo_energia', 0)) }}</td>
                                         <td class="text-center">{{ "%.1f"|format(dados.get('consumo_trabalhadores', dados.get('custo_trabalhadores', 0))) }}</td>
+                                        <td class="text-center">{{ "%.1f"|format(dados.get('consumo_chips_processamento', 0)) }}</td>
+                                        <td class="text-center">{{ "%.1f"|format(dados.get('consumo_engenheiros_senior', 0)) }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO: Card de Trade-offs e Estratégia (Informativo) -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-lightbulb"></i> 💡 Mecanismos do Jogo: Trade-offs Estratégicos
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle"></i> <strong>Como Funciona:</strong> O jogo inclui mecanismos avançados que tornam suas decisões mais estratégicas. Entenda os trade-offs abaixo para otimizar seus resultados!
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Sinergias de Mercado -->
+                        <div class="col-lg-4 mb-3">
+                            <div class="card h-100 border-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary">
+                                        <i class="bi bi-diagram-3"></i> 🔗 Sinergias de Mercado
+                                    </h6>
+                                    <p class="small text-muted">Produtos complementares se beneficiam mutuamente quando produzidos juntos!</p>
+                                    <div class="trade-off-items">
+                                        <div class="mb-2 p-2 bg-light border rounded">
+                                            <strong class="text-success">Ecossistema Móvel</strong>
+                                            <span class="badge bg-success float-end">+15%</span>
+                                            <br><small class="text-muted">📱 Smartphone + ⌚ Smartwatch</small>
+                                            <br><small class="text-info">Mínimo: 10 unidades de cada</small>
+                                            <br><small class="text-danger">⚠️ Alto consumo de chips (3.5 + 2.8)</small>
+                                        </div>
+                                        <div class="mb-2 p-2 bg-light border rounded">
+                                            <strong class="text-info">Linha Computação</strong>
+                                            <span class="badge bg-info float-end">+10%</span>
+                                            <br><small class="text-muted">🖥️ Desktop + 💻 Laptop</small>
+                                            <br><small class="text-info">Mínimo: 10 unidades de cada</small>
+                                            <br><small class="text-success">✅ Melhores margens base (R$ 235 + R$ 175)</small>
+                                        </div>
+                                        <div class="mb-2 p-2 bg-light border rounded">
+                                            <strong class="text-warning">Fotografia Integrada</strong>
+                                            <span class="badge bg-warning float-end">+12%</span>
+                                            <br><small class="text-muted">📷 Camera + 📱 Smartphone</small>
+                                            <br><small class="text-info">Mínimo: 5 unidades de cada (mais fácil!)</small>
+                                            <br><small class="text-success">✅ Camera com ótima margem (R$ 125)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if empresa.historico|length > 0 and empresa.historico[-1].get('trade_offs') %}
+                    <!-- Análise do Último Turno -->
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h6 class="mb-3"><i class="bi bi-graph-up"></i> ✅ Trade-offs Ativados no Último Turno</h6>
+                                    {% set trade_offs = empresa.historico[-1].trade_offs %}
+                                    
+                                    <div class="row">
+                                        <!-- Sinergias Ativadas -->
+                                        {% if trade_offs.sinergias_ativas %}
+                                        <div class="col-md-6">
+                                            <strong>🔗 Sinergias Ativadas:</strong>
+                                            <ul class="mt-2">
+                                                {% for sinergia in trade_offs.sinergias_ativas %}
+                                                <li>
+                                                    <strong>{{ sinergia.descricao }}</strong><br>
+                                                    <small>{{ sinergia.beneficio }}</small><br>
+                                                    {% if sinergia.quantidades %}
+                                                    <small class="text-muted">
+                                                        Produção: 
+                                                        {% for prod, qtd in sinergia.quantidades.items() %}
+                                                            {{ prod }}: {{ qtd }}{% if not loop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </small>
+                                                    {% endif %}
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if not trade_offs.sinergias_ativas %}
+                                    <p class="mb-0 text-center">
+                                        <em>Nenhuma sinergia foi ativada no último turno. Tente combinar produtos dos mesmos grupos!</em>
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -656,6 +771,18 @@
                                                                 <td class="text-center">{{ "%.1f"|format(hist.consumo.trabalhadores) }} h-trab</td>
                                                                 <td class="text-end">R$ 25,00</td>
                                                                 <td class="text-end fw-bold">R$ {{ "%.2f"|format(hist.consumo.trabalhadores * 25.00) }}</td>
+                                                            </tr>
+                                                            <tr class="table-warning">
+                                                                <td>🔌 Chips de Processamento</td>
+                                                                <td class="text-center">{{ "%.1f"|format(hist.consumo.get('chips_processamento', 0)) }} un</td>
+                                                                <td class="text-end"><em>Sem custo</em></td>
+                                                                <td class="text-end text-muted">Restrição</td>
+                                                            </tr>
+                                                            <tr class="table-warning">
+                                                                <td>👨‍💻 Engenheiros Sênior</td>
+                                                                <td class="text-center">{{ "%.1f"|format(hist.consumo.get('engenheiros_senior', 0)) }} h-eng</td>
+                                                                <td class="text-end"><em>Sem custo</em></td>
+                                                                <td class="text-end text-muted">Restrição</td>
                                                             </tr>
                                                             <tr class="table-info">
                                                                 <td colspan="3" class="text-end"><strong>CUSTO TOTAL:</strong></td>
@@ -790,6 +917,16 @@
                         <label class="btn btn-outline-secondary" for="graficoTrabalhadores">
                             👥
                         </label>
+                        
+                        <input type="radio" class="btn-check" name="tipoGrafico" id="graficoChips" value="chips" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="graficoChips">
+                            🔌
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="tipoGrafico" id="graficoEngenheiros" value="engenheiros" autocomplete="off">
+                        <label class="btn btn-outline-danger" for="graficoEngenheiros">
+                            👨‍💻
+                        </label>
                     </div>
                 </div>
                 <div class="card-body">
@@ -801,6 +938,46 @@
                             <i class="bi bi-info-circle"></i> 
                             <span id="infoTexto"></span>
                         </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção Modelo Matemático -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calculator"></i> Modelo Matemático de Otimização
+                    </h5>
+                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseModeloMatematico" aria-expanded="false">
+                        <i class="bi bi-chevron-down"></i> Mostrar/Ocultar
+                    </button>
+                </div>
+                <div class="collapse" id="collapseModeloMatematico">
+                    <div class="card-body">
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-lightbulb"></i> <strong>Aprenda como funciona:</strong> 
+                            Este simulador utiliza um <strong>modelo de Programação Linear</strong> para encontrar a melhor decisão de produção. 
+                            Abaixo você pode visualizar o modelo de duas formas: genérica (matemática pura) ou com os valores reais do jogo.
+                        </div>
+
+                        <!-- Alternância entre genérico e com valores -->
+                        <div class="btn-group mb-4" role="group">
+                            <input type="radio" class="btn-check" name="tipoModeloAluno" id="radioGenericoAluno" value="generico" checked onchange="alternarModeloTipoAluno()">
+                            <label class="btn btn-outline-primary" for="radioGenericoAluno">
+                                <i class="bi bi-book"></i> Modelo Genérico
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="tipoModeloAluno" id="radioValoresAluno" value="valores" onchange="alternarModeloTipoAluno()">
+                            <label class="btn btn-outline-success" for="radioValoresAluno">
+                                <i class="bi bi-123"></i> Com Valores Reais
+                            </label>
+                        </div>
+                        
+                        {% include 'partials/modelo_matematico.html' %}
                     </div>
                 </div>
             </div>
@@ -897,7 +1074,9 @@
         dinheiro: {{ empresa.historico_recursos.dinheiro|tojson }},
         materia_prima: {{ empresa.historico_recursos.materia_prima|tojson }},
         energia: {{ empresa.historico_recursos.energia|tojson }},
-        trabalhadores: {{ empresa.historico_recursos.trabalhadores|tojson }}
+        trabalhadores: {{ empresa.historico_recursos.trabalhadores|tojson }},
+        chips_processamento: {{ empresa.historico_recursos.get('chips_processamento', [])|tojson }},
+        engenheiros_senior: {{ empresa.historico_recursos.get('engenheiros_senior', [])|tojson }}
     };
     
     // Histórico de custos (para calcular consumo de dinheiro corretamente)
@@ -908,7 +1087,9 @@
         dinheiro: {{ empresa.recursos_base.dinheiro }},
         materia_prima: {{ empresa.recursos_base.materia_prima }},
         energia: {{ empresa.recursos_base.energia }},
-        trabalhadores: {{ empresa.recursos_base.trabalhadores }}
+        trabalhadores: {{ empresa.recursos_base.trabalhadores }},
+        chips_processamento: {{ empresa.recursos_base.get('chips_processamento', 2000) }},
+        engenheiros_senior: {{ empresa.recursos_base.get('engenheiros_senior', 400) }}
     };
     
     // Calcular consumo
@@ -919,7 +1100,9 @@
         dinheiro: historicoCustos.map(h => h.custo || 0),  // CUSTO POSITIVO
         materia_prima: dadosRecursos.materia_prima.map(m => recursos_base.materia_prima - m),
         energia: dadosRecursos.energia.map(e => recursos_base.energia - e),
-        trabalhadores: dadosRecursos.trabalhadores.map(t => recursos_base.trabalhadores - t)
+        trabalhadores: dadosRecursos.trabalhadores.map(t => recursos_base.trabalhadores - t),
+        chips_processamento: (dadosRecursos.chips_processamento || []).map(c => recursos_base.chips_processamento - c),
+        engenheiros_senior: (dadosRecursos.engenheiros_senior || []).map(e => recursos_base.engenheiros_senior - e)
     };
     
     // Se houver apenas 1 registro, duplicar para formar área visível
@@ -929,6 +1112,12 @@
         dadosConsumo.materia_prima = [dadosConsumo.materia_prima[0], dadosConsumo.materia_prima[0]];
         dadosConsumo.energia = [dadosConsumo.energia[0], dadosConsumo.energia[0]];
         dadosConsumo.trabalhadores = [dadosConsumo.trabalhadores[0], dadosConsumo.trabalhadores[0]];
+        if (dadosConsumo.chips_processamento.length > 0) {
+            dadosConsumo.chips_processamento = [dadosConsumo.chips_processamento[0], dadosConsumo.chips_processamento[0]];
+        }
+        if (dadosConsumo.engenheiros_senior.length > 0) {
+            dadosConsumo.engenheiros_senior = [dadosConsumo.engenheiros_senior[0], dadosConsumo.engenheiros_senior[0]];
+        }
     }
     
     // Valores de limite superior (recursos_base)
@@ -936,7 +1125,9 @@
         dinheiro: recursos_base.dinheiro,
         materia: recursos_base.materia_prima,
         energia: recursos_base.energia,
-        trabalhadores: recursos_base.trabalhadores
+        trabalhadores: recursos_base.trabalhadores,
+        chips: recursos_base.chips_processamento,
+        engenheiros: recursos_base.engenheiros_senior
     };
     
     // Configurações de cores e labels
@@ -966,7 +1157,21 @@
             label: '👥 Trabalhadores',
             borderColor: '#9b59b6',
             backgroundColor: '#9b59b633',
-            metaLabel: 'Meta/Inicial: 800 h-trab',
+            metaLabel: 'Meta/Inicial: 600 h-trab',
+            formato: (val) => val.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 1}) + ' h'
+        },
+        chips: {
+            label: '🔌 Chips de Processamento',
+            borderColor: '#3498db',
+            backgroundColor: '#3498db33',
+            metaLabel: 'Meta/Inicial: 2.000 un',
+            formato: (val) => val.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 1}) + ' un'
+        },
+        engenheiros: {
+            label: '👨‍💻 Engenheiros Sênior',
+            borderColor: '#e74c3c',
+            backgroundColor: '#e74c3c33',
+            metaLabel: 'Meta/Inicial: 400 h-eng',
             formato: (val) => val.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 1}) + ' h'
         }
     };
@@ -1019,13 +1224,34 @@
                         tension: 0.3,
                         fill: true,
                         yAxisID: 'y'
+                    },
+                    {
+                        label: '🔌 Consumo Chips de Processamento',
+                        data: dadosConsumo.chips_processamento,
+                        borderColor: configRecursos.chips.borderColor,
+                        backgroundColor: configRecursos.chips.backgroundColor,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '👨‍💻 Consumo Engenheiros Sênior',
+                        data: dadosConsumo.engenheiros_senior,
+                        borderColor: configRecursos.engenheiros.borderColor,
+                        backgroundColor: configRecursos.engenheiros.backgroundColor,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y'
                     }
                 ]
             };
         } else {
             // Gráfico individual com CONSUMO e LIMITE SUPERIOR
             const config = configRecursos[tipo];
-            const dataKey = tipo === 'materia' ? 'materia_prima' : tipo;
+            let dataKey = tipo;
+            if (tipo === 'materia') dataKey = 'materia_prima';
+            else if (tipo === 'chips') dataKey = 'chips_processamento';
+            else if (tipo === 'engenheiros') dataKey = 'engenheiros_senior';
             const limiteSuperior = limitesSuperior[tipo];
             
             return {
@@ -1142,6 +1368,49 @@
     let ultimaIteracao = {{ iteracao_atual }};
     let iteracaoAberta = {{ 'true' if iteracao_aberta else 'false' }};
     let processandoTurno = false;
+    let ultimaDecisaoConfirmada = {{ 'true' if empresa.decisao_confirmada else 'false' }};
+    let ultimaDecisaoHash = JSON.stringify({{ empresa.decisao_atual|tojson }});
+    
+    // Função para mostrar notificações toast
+    function mostrarNotificacao(mensagem, tipo = 'info') {
+        // Criar container de notificações se não existir
+        if ($('#notification-container').length === 0) {
+            $('body').append('<div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;"></div>');
+        }
+        
+        const cores = {
+            'success': 'bg-success',
+            'info': 'bg-info',
+            'warning': 'bg-warning',
+            'danger': 'bg-danger'
+        };
+        
+        const corClasse = cores[tipo] || cores['info'];
+        
+        const toast = $(`
+            <div class="toast align-items-center text-white ${corClasse} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${mensagem}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `);
+        
+        $('#notification-container').append(toast);
+        
+        const toastBootstrap = new bootstrap.Toast(toast[0], {
+            autohide: true,
+            delay: 5000
+        });
+        toastBootstrap.show();
+        
+        // Remover após fechar
+        toast.on('hidden.bs.toast', function() {
+            $(this).remove();
+        });
+    }
     
     // Função para formatar números (mostra decimal apenas se necessário)
     function formatarNumero(valor, casasDecimais) {
@@ -1274,36 +1543,56 @@
                     $('#lucro-valor').addClass(data.lucro_ultimo_turno > 0 ? 'text-success' : (data.lucro_ultimo_turno < 0 ? 'text-danger' : 'text-secondary'));
                 }
                 
-                // Atualizar sliders se houver decisões não confirmadas (enviadas pelo admin via "Enviar Ótimo")
-                if (data.decisoes_nao_confirmadas && Object.keys(data.decisoes_nao_confirmadas).length > 0 && !data.decisao_confirmada) {
-                    console.log('Atualizando sliders com decisões pendentes:', data.decisoes_nao_confirmadas);
+                // Atualizar sliders com decisão atual (seja confirmada ou não)
+                // Isso permite que o admin aplique solução ótima e o aluno veja em tempo real
+                const decisaoAtual = data.decisao_atual || data.decisoes_nao_confirmadas || {};
+                const novaDecisaoHash = JSON.stringify(decisaoAtual);
+                
+                // Detectar se professor aplicou solução ótima
+                if (decisaoAtual && Object.keys(decisaoAtual).length > 0) {
+                    // Verificar se houve mudança na decisão E foi confirmada pelo professor
+                    const decisaoMudou = novaDecisaoHash !== ultimaDecisaoHash;
+                    const foiConfirmadaPeloProf = data.decisao_confirmada && !ultimaDecisaoConfirmada;
                     
-                    // Atualizar cada produto
-                    Object.keys(data.decisoes_nao_confirmadas).forEach(function(produto) {
-                        const quantidade = data.decisoes_nao_confirmadas[produto];
+                    if (decisaoMudou || foiConfirmadaPeloProf) {
+                        console.log('Atualizando sliders com decisão:', decisaoAtual, 'Confirmada:', data.decisao_confirmada);
                         
-                        // Atualizar input numérico
-                        const input = $('input[data-produto="' + produto + '"]');
-                        if (input.length) {
-                            input.val(quantidade);
-                        }
-                        
-                        // Atualizar slider correspondente
-                        const sliderId = input.attr('id');
-                        if (sliderId) {
-                            const sliderIndex = sliderId.split('_')[1];
-                            const slider = $('#slider_' + sliderIndex);
-                            if (slider.length) {
-                                slider.val(quantidade);
+                        // Atualizar cada produto
+                        Object.keys(decisaoAtual).forEach(function(produto) {
+                            const quantidade = decisaoAtual[produto];
+                            
+                            // Atualizar input numérico
+                            const input = $('input[data-produto="' + produto + '"]');
+                            if (input.length) {
+                                input.val(quantidade);
                             }
+                            
+                            // Atualizar slider correspondente
+                            const sliderId = input.attr('id');
+                            if (sliderId) {
+                                const sliderIndex = sliderId.split('_')[1];
+                                const slider = $('#slider_' + sliderIndex);
+                                if (slider.length) {
+                                    slider.val(quantidade);
+                                }
+                            }
+                            
+                            // Trigger do evento para atualizar displays
+                            input.trigger('input');
+                        });
+                        
+                        // Recalcular recursos após atualizar sliders
+                        calcularRecursos();
+                        
+                        // Mostrar notificação se foi aplicada pelo professor
+                        if (foiConfirmadaPeloProf) {
+                            mostrarNotificacao('✅ Professor aplicou solução ótima e confirmou automaticamente!', 'success');
                         }
                         
-                        // Trigger do evento para atualizar displays
-                        input.trigger('input');
-                    });
-                    
-                    // Recalcular recursos após atualizar sliders
-                    calcularRecursos();
+                        // Atualizar controles
+                        ultimaDecisaoHash = novaDecisaoHash;
+                        ultimaDecisaoConfirmada = data.decisao_confirmada;
+                    }
                 }
                 
                 // Verificar se mudou de iteração ou estado
@@ -1420,5 +1709,29 @@
     
     // Atualizar a cada 3 segundos
     setInterval(atualizarEstadoJogo, 3000);
+    
+    // Função para alternar entre modelo genérico e com valores (Aluno)
+    function alternarModeloTipoAluno() {
+        const tipoModelo = $('input[name="tipoModeloAluno"]:checked').val();
+        if (tipoModelo === 'generico') {
+            $('#modelo-generico').show();
+            $('#modelo-valores').hide();
+        } else {
+            $('#modelo-generico').hide();
+            $('#modelo-valores').show();
+        }
+        
+        // Re-renderizar fórmulas matemáticas após alternar
+        if (typeof renderMathInElement !== 'undefined') {
+            setTimeout(function() {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ]
+                });
+            }, 100);
+        }
+    }
 </script>
 {% endblock %}

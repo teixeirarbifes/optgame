@@ -59,7 +59,9 @@ class GameMechanics:
             "materia_prima": 0.0,
             "energia": 0.0,
             "trabalhadores": 0.0,
-            "dinheiro": 0.0
+            "dinheiro": 0.0,
+            "chips_processamento": 0.0,
+            "engenheiros_senior": 0.0
         }
 
         for produto, quantidade in (variaveis_decisao or {}).items():
@@ -72,12 +74,16 @@ class GameMechanics:
             consumo_materia = dados.get("consumo_materia", dados.get("custo_materia", 0))
             consumo_energia = dados.get("consumo_energia", dados.get("custo_energia", 0))
             consumo_trab = dados.get("consumo_trabalhadores", dados.get("custo_trabalhadores", 0))
+            consumo_chips = dados.get("consumo_chips_processamento", 0)
+            consumo_eng = dados.get("consumo_engenheiros_senior", 0)
             
             consumo["materia_prima"] += consumo_materia * quantidade
             consumo["energia"] += consumo_energia * quantidade
             consumo["trabalhadores"] += consumo_trab * quantidade
+            consumo["chips_processamento"] += consumo_chips * quantidade
+            consumo["engenheiros_senior"] += consumo_eng * quantidade
             
-            # Custo monetário = consumo × custo_unitário
+            # Custo monetário = consumo × custo_unitário (recursos especializados não têm custo)
             consumo["dinheiro"] += (
                 consumo_materia * quantidade * GameConfig.CUSTOS_UNITARIOS_RECURSOS.get('materia_prima', 1.5) +
                 consumo_energia * quantidade * GameConfig.CUSTOS_UNITARIOS_RECURSOS.get('energia', 0.8) +

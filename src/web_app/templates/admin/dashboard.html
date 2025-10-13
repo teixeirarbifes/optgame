@@ -137,6 +137,11 @@
                         
                         <!-- Botões Administrativos - Sutis e Pequenos -->
                         <div class="col-auto">
+                            <button class="btn btn-outline-info btn-sm" onclick="mostrarModeloMatematico()" title="Ver Modelo Matemático">
+                                <i class="bi bi-calculator"></i> <small>Modelo Matemático</small>
+                            </button>
+                        </div>
+                        <div class="col-auto">
                             <button class="btn btn-outline-secondary btn-sm" onclick="confirmarInvalidarSessoes()" title="Deslogar Todos">
                                 <i class="bi bi-door-closed"></i> <small>Deslogar</small>
                             </button>
@@ -163,6 +168,108 @@
             </div>
         </div>
     </div>
+
+    <!-- Gerador de Modelo Default -->
+    <!--div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-magic"></i> Gerador de Modelo Default (Otimizador Inverso)
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">
+                                <i class="bi bi-target"></i> Produção Esperada (Fixar como Constantes)
+                            </h6>
+                            <div class="row g-2">
+                                {% for produto_key, produto_data in produtos.items() %}
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ produto_data.emoji }} {{ produto_key }}</label>
+                                    <input type="number" class="form-control form-control-sm" 
+                                           id="producao-{{ produto_key }}" 
+                                           value="0" min="0" step="1"
+                                           placeholder="Qtd esperada">
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success mb-3">
+                                <i class="bi bi-sliders"></i> Parâmetros Principais (Otimizar)
+                            </h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">💰 Dinheiro Base</label>
+                                    <input type="number" class="form-control form-control-sm" 
+                                           id="param-dinheiro" 
+                                           value="{{ recursos_base.dinheiro }}" 
+                                           min="10000" step="1000">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">📦 Matéria-Prima</label>
+                                    <input type="number" class="form-control form-control-sm" 
+                                           id="param-materia" 
+                                           value="{{ recursos_base.materia_prima }}" 
+                                           min="5000" step="500">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">⚡ Energia</label>
+                                    <input type="number" class="form-control form-control-sm" 
+                                           id="param-energia" 
+                                           value="{{ recursos_base.energia }}" 
+                                           min="5000" step="500">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">👥 Trabalhadores</label>
+                                    <input type="number" class="form-control form-control-sm" 
+                                           id="param-trabalhadores" 
+                                           value="{{ recursos_base.trabalhadores }}" 
+                                           min="200" step="50">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Aplicar para:</label>
+                            <select class="form-select form-select-sm" id="aplicar-modelo-para">
+                                <option value="todas">🌍 Todas as Empresas</option>
+                                <option value="nova">🆕 Próximas Empresas (Default)</option>
+                                {% for nome_empresa in empresas.keys() %}
+                                <option value="{{ nome_empresa }}">🏢 {{ nome_empresa }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-primary" onclick="gerarModeloDefault()" id="btnGerarModelo">
+                                    <i class="bi bi-magic"></i> Gerar Modelo Otimizado
+                                </button>
+                                <button class="btn btn-success" onclick="aplicarModeloDefault()" id="btnAplicarModelo" disabled>
+                                    <i class="bi bi-check-circle"></i> APLICAR Default
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="limparModelo()">
+                                    <i class="bi bi-x-circle"></i> Limpar
+                                </button>
+                            </div>
+                        </div>
+                    </div-->
+                    
+                    <!-- Resultado do Modelo -->
+                    <!--div id="resultado-modelo" class="mt-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle"></i> Modelo Gerado:</h6>
+                            <div id="detalhes-modelo"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div-->
 
     <!-- Ranking e Status das Empresas -->
     <div class="row">
@@ -1489,6 +1596,201 @@
         });
     }
     
+    // ========================================
+    // Gerador de Modelo Default (Otimizador Inverso)
+    // ========================================
+    
+    let modeloGerado = null; // Armazenar resultado do modelo
+    
+    function gerarModeloDefault() {
+        // Coletar produção esperada
+        const producaoEsperada = {};
+        {% for produto_key in produtos.keys() %}
+        const qtd{{ loop.index }} = parseInt($('#producao-{{ produto_key }}').val()) || 0;
+        if (qtd{{ loop.index }} > 0) {
+            producaoEsperada['{{ produto_key }}'] = qtd{{ loop.index }};
+        }
+        {% endfor %}
+        
+        // Verificar se pelo menos um produto foi definido
+        if (Object.keys(producaoEsperada).length === 0) {
+            showToast('Defina pelo menos um produto com produção esperada!', 'warning');
+            return;
+        }
+        
+        // Coletar parâmetros principais
+        const parametrosPrincipais = {
+            dinheiro: parseInt($('#param-dinheiro').val()) || 50000,
+            materia_prima: parseInt($('#param-materia').val()) || 20000,
+            energia: parseInt($('#param-energia').val()) || 15000,
+            trabalhadores: parseInt($('#param-trabalhadores').val()) || 600
+        };
+        
+        const aplicarPara = $('#aplicar-modelo-para').val();
+        
+        const dados = {
+            producao_esperada: producaoEsperada,
+            parametros_principais: parametrosPrincipais,
+            aplicar_para: aplicarPara
+        };
+        
+        showLoading();
+        $('#btnGerarModelo').prop('disabled', true);
+        
+        ajaxSeguro('/admin/api/gerar-modelo-default', {
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(dados)
+        }).done(function(response) {
+            hideLoading();
+            $('#btnGerarModelo').prop('disabled', false);
+            
+            if (response.sucesso) {
+                modeloGerado = response.modelo;
+                mostrarResultadoModelo(response);
+                $('#btnAplicarModelo').prop('disabled', false);
+                showToast('Modelo gerado com sucesso!', 'success');
+            } else {
+                showToast(response.mensagem || 'Erro ao gerar modelo', 'danger');
+            }
+        }).fail(function(xhr) {
+            hideLoading();
+            $('#btnGerarModelo').prop('disabled', false);
+            const msg = xhr.responseJSON?.mensagem || 'Erro ao gerar modelo';
+            showToast(msg, 'danger');
+        });
+    }
+    
+    function mostrarResultadoModelo(response) {
+        const modelo = response.modelo;
+        let html = `
+            <div class="row">
+                <div class="col-md-4">
+                    <h6 class="text-success"><i class="bi bi-check-circle"></i> Recursos Otimizados:</h6>
+                    <ul class="list-unstyled">
+                        <li>💰 Dinheiro: <strong>R$ ${modelo.parametros_otimizados.dinheiro.toLocaleString()}</strong></li>
+                        <li>📦 Matéria-Prima: <strong>${modelo.parametros_otimizados.materia_prima.toLocaleString()}</strong></li>
+                        <li>⚡ Energia: <strong>${modelo.parametros_otimizados.energia.toLocaleString()}</strong></li>
+                        <li>👥 Trabalhadores: <strong>${modelo.parametros_otimizados.trabalhadores}</strong></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="text-primary"><i class="bi bi-target"></i> Produção Fixa:</h6>
+                    <ul class="list-unstyled">`;
+        
+        for (const [produto, qtd] of Object.entries(modelo.producao_fixa)) {
+            html += `<li><strong>${produto}:</strong> ${qtd} unidades</li>`;
+        }
+        
+        html += `
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="text-warning"><i class="bi bi-sliders"></i> Custos Otimizados:</h6>
+                    <div style="max-height: 150px; overflow-y: auto;">`;
+        
+        if (modelo.custos_produtos_otimizados) {
+            for (const [produto, custos] of Object.entries(modelo.custos_produtos_otimizados)) {
+                html += `
+                    <div class="mb-1">
+                        <small><strong>${produto}:</strong></small><br>
+                        <small class="text-muted">
+                            📦${custos.consumo_materia} ⚡${custos.consumo_energia} 👥${custos.consumo_trabalhadores}
+                        </small>
+                    </div>`;
+            }
+        }
+        
+        html += `
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-success">
+                            <strong>💰 Receita Esperada:</strong> R$ ${modelo.receita_esperada ? modelo.receita_esperada.toLocaleString() : 'N/A'}
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-info">
+                            <strong>📈 Lucro Esperado:</strong> R$ ${modelo.lucro_esperado ? modelo.lucro_esperado.toLocaleString() : 'N/A'}
+                        </small>
+                    </div>
+                </div>
+                <small class="text-muted">
+                    <strong>Aplicar para:</strong> ${response.aplicar_para === 'todas' ? '🌍 Todas as Empresas' : 
+                                                    response.aplicar_para === 'nova' ? '🆕 Próximas Empresas' : 
+                                                    '🏢 ' + response.aplicar_para}
+                </small>
+            </div>`;
+        
+        $('#detalhes-modelo').html(html);
+        $('#resultado-modelo').slideDown();
+    }
+    
+    function aplicarModeloDefault() {
+        if (!modeloGerado) {
+            showToast('Gere um modelo primeiro!', 'warning');
+            return;
+        }
+        
+        const aplicarPara = $('#aplicar-modelo-para').val();
+        
+        showLoading();
+        $('#btnAplicarModelo').prop('disabled', true);
+        
+        ajaxSeguro('/admin/api/aplicar-modelo-default', {
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                modelo: modeloGerado,
+                aplicar_para: aplicarPara
+            })
+        }).done(function(response) {
+            hideLoading();
+            $('#btnAplicarModelo').prop('disabled', false);
+            
+            if (response.sucesso) {
+                showToast(response.mensagem, 'success');
+                atualizarDashboard(); // Refresh do dashboard
+                limparModelo(); // Limpar formulário
+            } else {
+                showToast(response.mensagem || 'Erro ao aplicar modelo', 'danger');
+            }
+        }).fail(function(xhr) {
+            hideLoading();
+            $('#btnAplicarModelo').prop('disabled', false);
+            const msg = xhr.responseJSON?.mensagem || 'Erro ao aplicar modelo';
+            showToast(msg, 'danger');
+        });
+    }
+    
+    function limparModelo() {
+        // Limpar produção esperada
+        {% for produto_key in produtos.keys() %}
+        $('#producao-{{ produto_key }}').val(0);
+        {% endfor %}
+        
+        // Resetar parâmetros para valores padrão
+        $('#param-dinheiro').val({{ recursos_base.dinheiro }});
+        $('#param-materia').val({{ recursos_base.materia_prima }});
+        $('#param-energia').val({{ recursos_base.energia }});
+        $('#param-trabalhadores').val({{ recursos_base.trabalhadores }});
+        
+        // Resetar seleção
+        $('#aplicar-modelo-para').val('nova');
+        
+        // Ocultar resultado
+        $('#resultado-modelo').slideUp();
+        $('#btnAplicarModelo').prop('disabled', true);
+        
+        // Limpar modelo armazenado
+        modeloGerado = null;
+    }
+    
+    // ========================================
+    
     // Inicializar
     $(document).ready(function() {
         inicializarGrafico();
@@ -1506,5 +1808,56 @@
             atualizarListaSaves();
         });
     });
+    
+    // Função para mostrar modal do modelo matemático
+    function mostrarModeloMatematico() {
+        $('#modalModeloMatematico').modal('show');
+    }
+    
+    // Alternar entre modelo genérico e com valores
+    function alternarModeloTipo() {
+        const tipoModelo = $('input[name="tipoModelo"]:checked').val();
+        if (tipoModelo === 'generico') {
+            $('#modelo-generico').show();
+            $('#modelo-valores').hide();
+        } else {
+            $('#modelo-generico').hide();
+            $('#modelo-valores').show();
+        }
+    }
 </script>
+
+<!-- Modal Modelo Matemático -->
+<div class="modal fade" id="modalModeloMatematico" tabindex="-1" aria-labelledby="modalModeloLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalModeloLabel">
+                    <i class="bi bi-calculator"></i> Modelo Matemático de Otimização
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Alternância entre genérico e com valores -->
+                <div class="btn-group mb-4" role="group">
+                    <input type="radio" class="btn-check" name="tipoModelo" id="radioGenerico" value="generico" checked onchange="alternarModeloTipo()">
+                    <label class="btn btn-outline-primary" for="radioGenerico">
+                        <i class="bi bi-book"></i> Modelo Genérico
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="tipoModelo" id="radioValores" value="valores" onchange="alternarModeloTipo()">
+                    <label class="btn btn-outline-success" for="radioValores">
+                        <i class="bi bi-123"></i> Com Valores Reais
+                    </label>
+                </div>
+                
+                {% include 'partials/modelo_matematico.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

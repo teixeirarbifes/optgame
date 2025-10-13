@@ -26,7 +26,6 @@ if __name__ == '__main__':
     print("   http://localhost:5000")
     print("\n👨‍🏫 Área Administrativa:")
     print("   http://localhost:5000/admin")
-    print("   Senha: admin123")
     print("\n👨‍🎓 Área dos Alunos:")
     print("   http://localhost:5000/aluno")
     print("\n" + "="*60 + "\n")

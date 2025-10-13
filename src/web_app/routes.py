@@ -8,6 +8,7 @@ import secrets
 import hashlib
 import uuid
 import json
+import random
 from .game_state import game_state
 from config.constants import GameConfig
 
@@ -161,7 +162,8 @@ def dashboard():
                          estatisticas=estatisticas,
                          ranking=ranking,
                          empresas=game_state.empresas,
-                         produtos=game_state.produtos)
+                         produtos=game_state.produtos,
+                         recursos_base=GameConfig.RECURSOS_BASE)
 
 @admin_bp.route('/empresas')
 @admin_required
@@ -707,6 +709,7 @@ def api_estado():
         'recursos_maximos': GameConfig.RECURSOS_BASE,
         'lucro_ultimo_turno': empresa.get('lucro_ultimo_turno', 0),
         'decisao_anterior': decisao_anterior,
+        'decisao_atual': empresa.get('decisao_atual', {}),  # Decisão atual (confirmada ou não)
         'decisao_confirmada': empresa.get('decisao_confirmada', False),
         'decisoes_nao_confirmadas': empresa.get('decisoes_nao_confirmadas', {}),
         'historico': empresa.get('historico', [])
@@ -738,9 +741,9 @@ def enviar_decisao():
         for produto in game_state.produtos.keys():
             quantidade = request.form.get(f'produto_{produto}', 0)
             try:
-                quantidade = int(quantidade)
+                quantidade = float(quantidade)  # Aceita valores decimais
                 if quantidade >= 0:
-                    decisoes[produto] = quantidade
+                    decisoes[produto] = round(quantidade, 2)  # Arredonda para 2 casas decimais
             except:
                 decisoes[produto] = 0
     
@@ -848,6 +851,396 @@ def remover_empresa(nome):
         del game_state.empresas[nome]
         return jsonify({'sucesso': True})
     return jsonify({'sucesso': False, 'mensagem': 'Empresa não encontrada'})
+
+@admin_bp.route('/api/gerar-modelo-default', methods=['POST'])
+@admin_required
+@csrf_required
+def gerar_modelo_default():
+    """Gerar modelo default otimizando parâmetros do jogo para produção fixa"""
+    dados = request.get_json()
+    
+    if not dados:
+        return jsonify({'sucesso': False, 'mensagem': 'Dados não fornecidos'}), 400
+    
+    producao_esperada = dados.get('producao_esperada', {})
+    parametros_principais = dados.get('parametros_principais', {})
+    aplicar_para = dados.get('aplicar_para', 'nova')
+    
+    if not producao_esperada:
+        return jsonify({'sucesso': False, 'mensagem': 'Produção esperada não definida'}), 400
+    
+    try:
+        # Validar produtos
+        produtos_validos = set(game_state.produtos.keys())
+        for produto in producao_esperada.keys():
+            if produto not in produtos_validos:
+                return jsonify({'sucesso': False, 'mensagem': f'Produto inválido: {produto}'}), 400
+        
+        # Usar recursos base realistas (limitar dentro de faixas sensatas)
+        recursos_alvo = {
+            'dinheiro': max(50000, min(500000, parametros_principais.get('dinheiro', 50000))),
+            'materia_prima': max(10000, min(100000, parametros_principais.get('materia_prima', 20000))),
+            'energia': max(10000, min(100000, parametros_principais.get('energia', 15000))),
+            'trabalhadores': max(300, min(5000, parametros_principais.get('trabalhadores', 600)))
+        }
+        
+        # Definir perfis únicos e bem diferenciados por produto
+        perfis_produtos = {
+            'Camera': {'prioridade_materia': 0.4, 'prioridade_energia': 0.3, 'prioridade_trabalho': 0.3},
+            'Desktop': {'prioridade_materia': 0.5, 'prioridade_energia': 0.4, 'prioridade_trabalho': 0.1},
+            'Impressora': {'prioridade_materia': 0.3, 'prioridade_energia': 0.2, 'prioridade_trabalho': 0.5},
+            'Laptop': {'prioridade_materia': 0.45, 'prioridade_energia': 0.35, 'prioridade_trabalho': 0.2},
+            'Smartphone': {'prioridade_materia': 0.25, 'prioridade_energia': 0.5, 'prioridade_trabalho': 0.25},
+            'Smartwatch': {'prioridade_materia': 0.2, 'prioridade_energia': 0.3, 'prioridade_trabalho': 0.5}
+        }
+        
+        # Otimizar custos usando abordagem reversa
+        custos_otimizados = {}
+        
+        # Primeira passada: distribuir recursos base proporcionalmente
+        total_producao_ponderada = {
+            'materia_prima': 0,
+            'energia': 0,
+            'trabalhadores': 0
+        }
+        
+        # Calcular total ponderado por prioridades
+        for produto, quantidade in producao_esperada.items():
+            perfil = perfis_produtos.get(produto, {'prioridade_materia': 0.33, 'prioridade_energia': 0.33, 'prioridade_trabalho': 0.34})
+            total_producao_ponderada['materia_prima'] += quantidade * perfil['prioridade_materia']
+            total_producao_ponderada['energia'] += quantidade * perfil['prioridade_energia']  
+            total_producao_ponderada['trabalhadores'] += quantidade * perfil['prioridade_trabalho']
+        
+        # Recursos disponíveis para distribuir (85% para dar margem)
+        recursos_distribuir = {
+            'materia_prima': int(recursos_alvo['materia_prima'] * 0.85),
+            'energia': int(recursos_alvo['energia'] * 0.85),
+            'trabalhadores': int(recursos_alvo['trabalhadores'] * 0.85)
+        }
+        
+        # Calcular recursos disponíveis para distribuição
+        recursos_distribuir = {
+            'materia_prima': int(recursos_alvo['materia_prima'] * 0.85),
+            'energia': int(recursos_alvo['energia'] * 0.85),
+            'trabalhadores': int(recursos_alvo['trabalhadores'] * 0.85)
+        }
+        
+        # Definir multiplicadores para todos os produtos
+        multiplicadores = {
+            'Camera': {'materia': 1.5, 'energia': 1.2, 'trabalho': 1.8},
+            'Desktop': {'materia': 2.0, 'energia': 1.8, 'trabalho': 0.8},
+            'Impressora': {'materia': 1.3, 'energia': 0.9, 'trabalho': 2.2},
+            'Laptop': {'materia': 1.7, 'energia': 1.4, 'trabalho': 1.1},
+            'Smartphone': {'materia': 0.8, 'energia': 2.0, 'trabalho': 1.0},
+            'Smartwatch': {'materia': 0.6, 'energia': 1.1, 'trabalho': 2.5}
+        }
+        
+        # Calcular consumo base para produtos da produção esperada (eficientes)
+        produtos_esperados = set(producao_esperada.keys())
+        produtos_todos = set(game_state.produtos.keys())
+        produtos_nao_esperados = produtos_todos - produtos_esperados
+        
+        # Primeiro: calcular custos para produtos ESPERADOS (eficientes)
+        for produto, quantidade in producao_esperada.items():
+            perfil = perfis_produtos.get(produto, {'prioridade_materia': 0.33, 'prioridade_energia': 0.33, 'prioridade_trabalho': 0.34})
+            
+            # Calcular consumo por unidade baseado na proporção e prioridade
+            consumo_materia_total = (recursos_distribuir['materia_prima'] * quantidade * perfil['prioridade_materia']) / total_producao_ponderada['materia_prima']
+            consumo_energia_total = (recursos_distribuir['energia'] * quantidade * perfil['prioridade_energia']) / total_producao_ponderada['energia']
+            consumo_trabalhadores_total = (recursos_distribuir['trabalhadores'] * quantidade * perfil['prioridade_trabalho']) / total_producao_ponderada['trabalhadores']
+            
+            # Consumo por unidade (permitir decimais)
+            consumo_materia_unit = max(5.0, consumo_materia_total / quantidade)
+            consumo_energia_unit = max(3.0, consumo_energia_total / quantidade)
+            consumo_trabalhadores_unit = max(1.0, consumo_trabalhadores_total / quantidade)
+            
+            mult = multiplicadores.get(produto, {'materia': 1.0, 'energia': 1.0, 'trabalho': 1.0})
+            
+            # Aplicar multiplicadores e adicionar variação aleatória pequena
+            variacao = random.uniform(0.9, 1.1)  # ±10% de variação
+            
+            custos_otimizados[produto] = {
+                'consumo_materia': max(5.0, min(100.0, round(consumo_materia_unit * mult['materia'] * variacao, 1))),
+                'consumo_energia': max(3.0, min(80.0, round(consumo_energia_unit * mult['energia'] * variacao, 1))),
+                'consumo_trabalhadores': max(1.0, min(20.0, round(consumo_trabalhadores_unit * mult['trabalho'] * variacao, 1))),
+                'preco_venda': game_state.produtos[produto]['preco_venda']  # Manter preço original
+            }
+        
+        # Segundo: calcular custos para produtos NÃO ESPERADOS (menos eficientes)
+        for produto in produtos_nao_esperados:
+            # Usar perfis similares mas com penalidade de eficiência
+            mult_base = multiplicadores.get(produto, {'materia': 1.0, 'energia': 1.0, 'trabalho': 1.0})
+            
+            # Tornar produtos não esperados menos eficientes (mais caros)
+            penalidade_eficiencia = random.uniform(1.3, 1.8)  # 30% a 80% mais caro
+            variacao = random.uniform(0.9, 1.2)  # Mais variação
+            
+            # Custos base mais altos para produtos não esperados
+            custos_otimizados[produto] = {
+                'consumo_materia': max(8.0, min(120.0, round(25.0 * mult_base['materia'] * penalidade_eficiencia * variacao, 1))),
+                'consumo_energia': max(6.0, min(100.0, round(18.0 * mult_base['energia'] * penalidade_eficiencia * variacao, 1))),
+                'consumo_trabalhadores': max(2.0, min(25.0, round(8.0 * mult_base['trabalho'] * penalidade_eficiencia * variacao, 1))),
+                'preco_venda': game_state.produtos[produto]['preco_venda']  # Manter preço original
+            }
+        
+        # Calcular consumo total real com os custos otimizados (TODOS os produtos)
+        recursos_utilizados = {
+            'materia_prima': 0,
+            'energia': 0,
+            'trabalhadores': 0,
+            'dinheiro': 0
+        }
+        
+        # Calcular apenas para produtos esperados (que devem ser produzidos)
+        for produto, quantidade in producao_esperada.items():
+            recursos_utilizados['materia_prima'] += quantidade * custos_otimizados[produto]['consumo_materia']
+            recursos_utilizados['energia'] += quantidade * custos_otimizados[produto]['consumo_energia']
+            recursos_utilizados['trabalhadores'] += quantidade * custos_otimizados[produto]['consumo_trabalhadores']
+        
+        # Calcular custo em dinheiro
+        recursos_utilizados['dinheiro'] = (
+            recursos_utilizados['materia_prima'] * GameConfig.CUSTOS_UNITARIOS_RECURSOS['materia_prima'] +
+            recursos_utilizados['energia'] * GameConfig.CUSTOS_UNITARIOS_RECURSOS['energia'] +
+            recursos_utilizados['trabalhadores'] * GameConfig.CUSTOS_UNITARIOS_RECURSOS['trabalhadores']
+        )
+        
+        # Ajustar recursos alvo para garantir que a produção seja exatamente atingível
+        # Adicionar margem de 15% para garantir viabilidade
+        recursos_finais = {
+            'materia_prima': int(recursos_utilizados['materia_prima'] * 1.15),
+            'energia': int(recursos_utilizados['energia'] * 1.15),
+            'trabalhadores': int(recursos_utilizados['trabalhadores'] * 1.15),
+            'dinheiro': int(recursos_utilizados['dinheiro'] * 1.15)
+        }
+        
+        # CALIBRAÇÃO ITERATIVA: Ajustar até convergir na produção esperada
+        max_iteracoes = 5  # Máximo de iterações para evitar loop infinito
+        tolerancia = 0.03  # 3% de tolerância na produção
+        
+        for iteracao in range(max_iteracoes):
+            try:
+                from web_app.optimizer import ProductionOptimizer
+                
+                # Testar otimização com custos atuais
+                optimizer = ProductionOptimizer()
+                resultado_teste = optimizer.otimizar_producao(recursos_finais, produtos_customizados=custos_otimizados)
+                
+                if not resultado_teste.get('sucesso'):
+                    print(f"Iteração {iteracao + 1}: Otimização falhou")
+                    break
+                
+                producao_otima_teste = resultado_teste['producao_otima']
+                
+                # Verificar convergência
+                todos_convergidos = True
+                ajustes_realizados = {}
+                
+                for produto, quantidade_esperada in producao_esperada.items():
+                    quantidade_otima = producao_otima_teste.get(produto, 0)
+                    diferenca_percentual = abs(quantidade_otima - quantidade_esperada) / max(quantidade_esperada, 1)
+                    
+                    print(f"Iteração {iteracao + 1} - {produto}: esperado={quantidade_esperada}, otimo={quantidade_otima}, diff={diferenca_percentual:.3f}")
+                    
+                    if diferenca_percentual > tolerancia:
+                        todos_convergidos = False
+                        
+                        # Calcular fator de ajuste mais suave
+                        fator_erro = quantidade_esperada / max(quantidade_otima, 0.1)
+                        
+                        # Ajuste adaptativo baseado na magnitude do erro
+                        if diferenca_percentual > 0.2:  # Erro grande (>20%)
+                            intensidade_ajuste = 0.15  # Ajuste mais agressivo
+                        elif diferenca_percentual > 0.1:  # Erro médio (>10%)
+                            intensidade_ajuste = 0.08  # Ajuste moderado
+                        else:  # Erro pequeno (>3%)
+                            intensidade_ajuste = 0.03  # Ajuste suave
+                        
+                        if fator_erro > 1:  # Precisa produzir mais - reduzir custos
+                            fator_ajuste = 1 - intensidade_ajuste
+                        else:  # Produzindo demais - aumentar custos
+                            fator_ajuste = 1 + intensidade_ajuste
+                        
+                        # Aplicar ajuste
+                        custos_otimizados[produto]['consumo_materia'] = round(custos_otimizados[produto]['consumo_materia'] * fator_ajuste, 1)
+                        custos_otimizados[produto]['consumo_energia'] = round(custos_otimizados[produto]['consumo_energia'] * fator_ajuste, 1) 
+                        custos_otimizados[produto]['consumo_trabalhadores'] = round(custos_otimizados[produto]['consumo_trabalhadores'] * fator_ajuste, 1)
+                        
+                        ajustes_realizados[produto] = fator_ajuste
+                
+                print(f"Iteração {iteracao + 1}: Ajustes realizados: {ajustes_realizados}")
+                
+                # Se todos convergidos, parar
+                if todos_convergidos:
+                    print(f"Convergência atingida na iteração {iteracao + 1}!")
+                    break
+                
+                # Recalcular recursos utilizados após ajustes
+                recursos_utilizados = {
+                    'materia_prima': 0,
+                    'energia': 0,
+                    'trabalhadores': 0,
+                    'dinheiro': 0
+                }
+                
+                for produto, quantidade in producao_esperada.items():
+                    recursos_utilizados['materia_prima'] += quantidade * custos_otimizados[produto]['consumo_materia']
+                    recursos_utilizados['energia'] += quantidade * custos_otimizados[produto]['consumo_energia']
+                    recursos_utilizados['trabalhadores'] += quantidade * custos_otimizados[produto]['consumo_trabalhadores']
+                
+                recursos_utilizados['dinheiro'] = (
+                    recursos_utilizados['materia_prima'] * GameConfig.CUSTOS_UNITARIOS_RECURSOS['materia_prima'] +
+                    recursos_utilizados['energia'] * GameConfig.CUSTOS_UNITARIOS_RECURSOS['energia'] +
+                    recursos_utilizados['trabalhadores'] * GameConfig.CUSTOS_UNITARIOS_RECURSOS['trabalhadores']
+                )
+                
+                # Atualizar recursos finais
+                recursos_finais = {
+                    'materia_prima': int(recursos_utilizados['materia_prima'] * 1.15),
+                    'energia': int(recursos_utilizados['energia'] * 1.15),
+                    'trabalhadores': int(recursos_utilizados['trabalhadores'] * 1.15),
+                    'dinheiro': int(recursos_utilizados['dinheiro'] * 1.15)
+                }
+            
+            except Exception as e:
+                print(f"Erro na iteração {iteracao + 1}: {e}")
+                break
+        
+        print(f"Calibração finalizada após {min(iteracao + 1, max_iteracoes)} iterações")
+        
+        # Calcular receita total esperada
+        receita_total = sum(
+            quantidade * custos_otimizados[produto]['preco_venda'] 
+            for produto, quantidade in producao_esperada.items()
+        )
+        
+        lucro_esperado = receita_total - recursos_utilizados['dinheiro']
+        
+        # Modelo gerado
+        modelo = {
+            'producao_fixa': producao_esperada,
+            'parametros_otimizados': recursos_finais,
+            'custos_produtos_otimizados': custos_otimizados,
+            'recursos_utilizados': recursos_utilizados,
+            'receita_esperada': receita_total,
+            'lucro_esperado': lucro_esperado,
+            'timestamp': time.time()
+        }
+        
+        return jsonify({
+            'sucesso': True,
+            'mensagem': 'Modelo gerado com sucesso - parâmetros otimizados para cenário realista',
+            'modelo': modelo,
+            'aplicar_para': aplicar_para
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'sucesso': False, 
+            'mensagem': f'Erro ao gerar modelo: {str(e)}'
+        }), 500
+
+@admin_bp.route('/api/aplicar-modelo-default', methods=['POST'])
+@admin_required
+@csrf_required
+def aplicar_modelo_default():
+    """Aplicar modelo default gerado"""
+    dados = request.get_json()
+    
+    if not dados:
+        return jsonify({'sucesso': False, 'mensagem': 'Dados não fornecidos'}), 400
+    
+    modelo = dados.get('modelo')
+    aplicar_para = dados.get('aplicar_para', 'nova')
+    
+    if not modelo:
+        return jsonify({'sucesso': False, 'mensagem': 'Modelo não fornecido'}), 400
+    
+    try:
+        parametros_otimizados = modelo['parametros_otimizados']
+        producao_fixa = modelo['producao_fixa']
+        custos_produtos = modelo.get('custos_produtos_otimizados')
+        
+        aplicadas = 0
+        erros = []
+        
+        if aplicar_para == 'todas':
+            # Aplicar para todas empresas existentes
+            for nome_empresa in game_state.empresas.keys():
+                if _aplicar_modelo_empresa(nome_empresa, parametros_otimizados, producao_fixa, custos_produtos):
+                    aplicadas += 1
+                else:
+                    erros.append(f'Erro ao aplicar para {nome_empresa}')
+            
+            mensagem = f'Modelo aplicado para {aplicadas} empresas'
+            
+        elif aplicar_para == 'nova':
+            # Salvar como modelo default para próximas empresas
+            game_state.modelo_default = {
+                'recursos_base': parametros_otimizados,
+                'producao_sugerida': producao_fixa,
+                'custos_produtos_otimizados': custos_produtos,
+                'ativo': True
+            }
+            mensagem = 'Modelo salvo como default para próximas empresas'
+            
+        else:
+            # Aplicar para empresa específica
+            if aplicar_para in game_state.empresas:
+                if _aplicar_modelo_empresa(aplicar_para, parametros_otimizados, producao_fixa, custos_produtos):
+                    aplicadas = 1
+                    mensagem = f'Modelo aplicado para {aplicar_para}'
+                else:
+                    erros.append(f'Erro ao aplicar para {aplicar_para}')
+                    mensagem = 'Erro ao aplicar modelo'
+            else:
+                return jsonify({'sucesso': False, 'mensagem': 'Empresa não encontrada'}), 400
+        
+        if erros:
+            mensagem += f'. Erros: {"; ".join(erros)}'
+        
+        return jsonify({
+            'sucesso': True,
+            'mensagem': mensagem,
+            'empresas_aplicadas': aplicadas,
+            'erros': erros
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'sucesso': False,
+            'mensagem': f'Erro ao aplicar modelo: {str(e)}'
+        }), 500
+
+def _aplicar_modelo_empresa(nome_empresa, parametros_otimizados, producao_fixa, custos_produtos=None):
+    """Aplicar modelo para uma empresa específica (função auxiliar)"""
+    try:
+        empresa = game_state.empresas[nome_empresa]
+        
+        # Atualizar recursos base
+        empresa['recursos_base'] = parametros_otimizados.copy()
+        empresa['recursos_disponiveis'] = parametros_otimizados.copy()
+        
+        # Aplicar produção fixa como decisão atual (não confirmada)
+        empresa['decisao_atual'] = producao_fixa.copy()
+        empresa['decisao_confirmada'] = False
+        
+        # Aplicar custos otimizados de produtos se fornecidos
+        if custos_produtos:
+            if 'produtos_customizados' not in empresa:
+                empresa['produtos_customizados'] = {}
+            empresa['produtos_customizados'] = custos_produtos.copy()
+        
+        # Marcar como tendo modelo aplicado
+        empresa['modelo_aplicado'] = {
+            'timestamp': time.time(),
+            'parametros': parametros_otimizados,
+            'producao': producao_fixa,
+            'custos_produtos': custos_produtos
+        }
+        
+        return True
+    except Exception:
+        return False
 
 # Rota de validação removida - alunos devem enviar decisão sem pré-visualização
 # Resultados são revelados apenas após o professor processar o turno

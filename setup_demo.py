@@ -74,7 +74,6 @@ def setup_demo():
     print("\n📋 PRÓXIMOS PASSOS:\n")
     print("1. Execute: python web_server.py")
     print("2. Acesse: http://localhost:5000/admin")
-    print("   Senha Admin: admin123")
     print("\n3. Login dos Alunos: http://localhost:5000/aluno")
     print("\n🏢 EMPRESAS CRIADAS:")
     for empresa in empresas_demo:

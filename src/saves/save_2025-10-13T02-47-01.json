@@ -1,0 +1,389 @@
+{
+  "iteracao_atual": 3,
+  "max_iteracoes": 12,
+  "empresas": {
+    "AA": {
+      "nome": "AA",
+      "equipe": "",
+      "senha": "123",
+      "recursos_base": {
+        "dinheiro": 50000,
+        "materia_prima": 20000,
+        "energia": 15000,
+        "trabalhadores": 600,
+        "chips_processamento": 1800,
+        "engenheiros_senior": 350
+      },
+      "recursos_disponiveis": {
+        "dinheiro": 127121.9,
+        "materia_prima": 530.0,
+        "energia": 2926.0,
+        "trabalhadores": 4.0,
+        "chips_processamento": 1800,
+        "engenheiros_senior": 350
+      },
+      "decisao_atual": {},
+      "decisao_confirmada": false,
+      "historico": [
+        {
+          "turno": 1,
+          "decisao": {
+            "Smartphone": 244,
+            "Laptop": 0,
+            "Desktop": 0,
+            "Smartwatch": 244,
+            "Impressora": 400,
+            "Camera": 216
+          },
+          "receita": 121552.0,
+          "custo": 43379.0,
+          "lucro": 78173.0,
+          "consumo": {
+            "materia_prima": 18768.0,
+            "energia": 11828.0,
+            "trabalhadores": 598.5999999999999,
+            "dinheiro": 43379.0,
+            "chips_processamento": 1796.3999999999999,
+            "engenheiros_senior": 349.20000000000005
+          },
+          "violacoes": null,
+          "recursos_apos": {
+            "dinheiro": 128173.0,
+            "materia_prima": 1232.0,
+            "energia": 3172.0,
+            "trabalhadores": 1.400000000000091,
+            "chips_processamento": 1800,
+            "engenheiros_senior": 350
+          },
+          "trade_offs": {
+            "sinergias_ativas": [
+              {
+                "produtos": [
+                  "Smartphone",
+                  "Smartwatch"
+                ],
+                "bonus": 1.15,
+                "descricao": "Ecossistema Móvel",
+                "beneficio": "+15.0% margem"
+              },
+              {
+                "produtos": [
+                  "Camera",
+                  "Smartphone"
+                ],
+                "bonus": 1.12,
+                "descricao": "Fotografia Integrada",
+                "beneficio": "+12.0% margem"
+              }
+            ],
+            "recursos_especializados": {
+              "chips_processamento": {
+                "nome": "Chips Processamento",
+                "emoji": "🔌",
+                "consumo": 1796.4,
+                "capacidade": 1800,
+                "utilizacao_percentual": 99.8,
+                "disponivel": 3.6
+              },
+              "engenheiros_senior": {
+                "nome": "Eng. Sênior",
+                "emoji": "👨‍💻",
+                "consumo": 349.2,
+                "capacidade": 350,
+                "utilizacao_percentual": 99.8,
+                "disponivel": 0.8
+              }
+            }
+          }
+        },
+        {
+          "turno": 2,
+          "decisao": {
+            "Smartphone": 162,
+            "Laptop": 0,
+            "Desktop": 46,
+            "Smartwatch": 196,
+            "Impressora": 400,
+            "Camera": 216
+          },
+          "receita": 121446.0,
+          "custo": 44324.1,
+          "lucro": 77121.9,
+          "consumo": {
+            "materia_prima": 19470.0,
+            "energia": 12074.0,
+            "trabalhadores": 596.0,
+            "dinheiro": 44324.1,
+            "chips_processamento": 1457.8,
+            "engenheiros_senior": 299.29999999999995
+          },
+          "violacoes": null,
+          "recursos_apos": {
+            "dinheiro": 127121.9,
+            "materia_prima": 530.0,
+            "energia": 2926.0,
+            "trabalhadores": 4.0,
+            "chips_processamento": 1800,
+            "engenheiros_senior": 350
+          },
+          "trade_offs": {
+            "sinergias_ativas": [
+              {
+                "produtos": [
+                  "Smartphone",
+                  "Smartwatch"
+                ],
+                "bonus": 1.15,
+                "descricao": "Ecossistema Móvel",
+                "beneficio": "+15.0% margem"
+              },
+              {
+                "produtos": [
+                  "Camera",
+                  "Smartphone"
+                ],
+                "bonus": 1.12,
+                "descricao": "Fotografia Integrada",
+                "beneficio": "+12.0% margem"
+              }
+            ],
+            "recursos_especializados": {
+              "chips_processamento": {
+                "nome": "Chips Processamento",
+                "emoji": "🔌",
+                "consumo": 1457.8,
+                "capacidade": 1800,
+                "utilizacao_percentual": 81.0,
+                "disponivel": 342.2
+              },
+              "engenheiros_senior": {
+                "nome": "Eng. Sênior",
+                "emoji": "👨‍💻",
+                "consumo": 299.3,
+                "capacidade": 350,
+                "utilizacao_percentual": 85.5,
+                "disponivel": 50.7
+              }
+            }
+          }
+        }
+      ],
+      "historico_decisoes": [],
+      "historico_recursos": {
+        "turnos": [
+          1,
+          2
+        ],
+        "dinheiro": [
+          128173.0,
+          127121.9
+        ],
+        "materia_prima": [
+          1232.0,
+          530.0
+        ],
+        "energia": [
+          3172.0,
+          2926.0
+        ],
+        "trabalhadores": [
+          1.400000000000091,
+          4.0
+        ],
+        "chips_processamento": [
+          1800,
+          1800
+        ],
+        "engenheiros_senior": [
+          350,
+          350
+        ]
+      },
+      "lucro_total": 155294.9,
+      "lucro_ultimo_turno": 77121.9,
+      "iteracao_criacao": 1,
+      "criada_em": "2025-10-12T23:34:57.510515",
+      "solucao_otima": {
+        "Smartphone": 244.44,
+        "Smartwatch": 244.44,
+        "Impressora": 400.93,
+        "Camera": 216.67
+      },
+      "lucro_otimo": 86225.33,
+      "gap_percentual": 10.55772126357766,
+      "modelo_aplicado": null,
+      "produtos_customizados": null,
+      "historico_lucros": {
+        "turnos": [
+          1,
+          2
+        ],
+        "valores": [
+          78173.0,
+          77121.9
+        ]
+      }
+    }
+  },
+  "iteracao_aberta": false,
+  "historico_global": [
+    {
+      "turno": 1,
+      "timestamp": "2025-10-12T23:36:26.405194",
+      "resultados": [
+        {
+          "empresa": "AA",
+          "status": "processado",
+          "lucro": 78173.0,
+          "detalhes": [
+            {
+              "produto": "Smartphone",
+              "quantidade": 244,
+              "receita": 23912,
+              "custo": 0,
+              "lucro": 23912
+            },
+            {
+              "produto": "Smartwatch",
+              "quantidade": 244,
+              "receita": 14640,
+              "custo": 0,
+              "lucro": 14640
+            },
+            {
+              "produto": "Impressora",
+              "quantidade": 400,
+              "receita": 56000,
+              "custo": 0,
+              "lucro": 56000
+            },
+            {
+              "produto": "Camera",
+              "quantidade": 216,
+              "receita": 27000,
+              "custo": 0,
+              "lucro": 27000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "turno": 2,
+      "timestamp": "2025-10-12T23:45:20.316919",
+      "resultados": [
+        {
+          "empresa": "AA",
+          "status": "processado",
+          "lucro": 77121.9,
+          "detalhes": [
+            {
+              "produto": "Smartphone",
+              "quantidade": 162,
+              "receita": 15876,
+              "custo": 0,
+              "lucro": 15876
+            },
+            {
+              "produto": "Desktop",
+              "quantidade": 46,
+              "receita": 10810,
+              "custo": 0,
+              "lucro": 10810
+            },
+            {
+              "produto": "Smartwatch",
+              "quantidade": 196,
+              "receita": 11760,
+              "custo": 0,
+              "lucro": 11760
+            },
+            {
+              "produto": "Impressora",
+              "quantidade": 400,
+              "receita": 56000,
+              "custo": 0,
+              "lucro": 56000
+            },
+            {
+              "produto": "Camera",
+              "quantidade": 216,
+              "receita": 27000,
+              "custo": 0,
+              "lucro": 27000
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "produtos": {
+    "Smartphone": {
+      "consumo_materia": 12,
+      "consumo_energia": 7,
+      "consumo_trabalhadores": 0.5,
+      "consumo_chips_processamento": 3.5,
+      "consumo_engenheiros_senior": 0.4,
+      "preco_venda": 98,
+      "cor": "#E74C3C",
+      "emoji": "📱"
+    },
+    "Laptop": {
+      "consumo_materia": 30,
+      "consumo_energia": 15,
+      "consumo_trabalhadores": 0.8,
+      "consumo_chips_processamento": 2.8,
+      "consumo_engenheiros_senior": 0.4,
+      "preco_venda": 175,
+      "cor": "#3498DB",
+      "emoji": "💻"
+    },
+    "Desktop": {
+      "consumo_materia": 45,
+      "consumo_energia": 22,
+      "consumo_trabalhadores": 1.2,
+      "consumo_chips_processamento": 1.8,
+      "consumo_engenheiros_senior": 0.15,
+      "preco_venda": 235,
+      "cor": "#9B59B6",
+      "emoji": "🖥️"
+    },
+    "Smartwatch": {
+      "consumo_materia": 8,
+      "consumo_energia": 4,
+      "consumo_trabalhadores": 0.35,
+      "consumo_chips_processamento": 2.8,
+      "consumo_engenheiros_senior": 0.5,
+      "preco_venda": 60,
+      "cor": "#1ABC9C",
+      "emoji": "⌚"
+    },
+    "Impressora": {
+      "consumo_materia": 25,
+      "consumo_energia": 18,
+      "consumo_trabalhadores": 0.6,
+      "consumo_chips_processamento": 0.0,
+      "consumo_engenheiros_senior": 0.0,
+      "preco_venda": 140,
+      "cor": "#34495E",
+      "emoji": "🖨️"
+    },
+    "Camera": {
+      "consumo_materia": 18,
+      "consumo_energia": 9,
+      "consumo_trabalhadores": 0.7,
+      "consumo_chips_processamento": 1.2,
+      "consumo_engenheiros_senior": 0.6,
+      "preco_venda": 125,
+      "cor": "#E67E22",
+      "emoji": "📷"
+    }
+  },
+  "auto_save_enabled": false,
+  "_metadata": {
+    "versao": "2.1",
+    "data_save": "2025-10-12T23:47:02.623951",
+    "total_empresas": 1,
+    "iteracao_atual": 3
+  }
+}
