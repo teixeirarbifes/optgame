@@ -357,8 +357,8 @@
                                         {% endif %}
                                     </td>
                                     <td class="text-end">
-                                        <span class="badge {% if empresa.lucro_total > 0 %}bg-success{% else %}bg-danger{% endif %}">
-                                            R$ {{ "%.2f"|format(empresa.lucro_total) }}
+                                        <span class="badge {% if empresa.lucro_ultimo_turno > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                            R$ {{ "%.2f"|format(empresa.lucro_ultimo_turno) }}
                                         </span>
                                     </td>
                                 </tr>
@@ -1225,7 +1225,7 @@
                         else if (index === 2) medalha = '<i class="bi bi-trophy-fill" style="color: #cd7f32;"></i>';
                         else medalha = index + 1;
                         
-                        const lucroClass = empresa.lucro_total > 0 ? 'bg-success' : 'bg-danger';
+                        const lucroClass = empresa.lucro_ultimo_turno > 0 ? 'bg-success' : 'bg-danger';
                         
                         const rowRanking = `
                             <tr>
@@ -1235,7 +1235,7 @@
                                     ${empresa.equipe ? '<br><small class="text-muted">' + empresa.equipe + '</small>' : ''}
                                 </td>
                                 <td class="text-end">
-                                    <span class="badge ${lucroClass}">R$ ${empresa.lucro_total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                    <span class="badge ${lucroClass}">R$ ${empresa.lucro_ultimo_turno.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                                 </td>
                             </tr>
                         `;
@@ -1268,7 +1268,7 @@
                             <tr data-empresa="${empresa.nome}" class="empresa-row">
                                 <td>
                                     <strong>${empresa.nome}</strong>
-                                    <br><small class="text-muted">Última: R$ <span class="lucro-ultima">${empresa.lucro_total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></small>
+                                    <br><small class="text-muted">Última: R$ <span class="lucro-ultima">${empresa.lucro_ultimo_turno.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></small>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge ${statusClass} badge-status">
@@ -1322,7 +1322,7 @@
                         }
                         
                         // Atualizar lucro da última iteração
-                        row.find('.lucro-ultima').text(empresa.lucro_total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                        row.find('.lucro-ultima').text(empresa.lucro_ultimo_turno.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
                         
                         // Atualizar GAP%
                         if (empresa.gap_percentual != null) {
@@ -1339,9 +1339,9 @@
                     // Atualizar ranking
                     const rankingRow = $('#rankingTable tr').eq(index);
                     if (rankingRow.length) {
-                        const lucroClass = empresa.lucro_total > 0 ? 'bg-success' : 'bg-danger';
+                        const lucroClass = empresa.lucro_ultimo_turno > 0 ? 'bg-success' : 'bg-danger';
                         rankingRow.find('td:eq(2)').html(`
-                            <span class="badge ${lucroClass}">R$ ${empresa.lucro_total.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            <span class="badge ${lucroClass}">R$ ${empresa.lucro_ultimo_turno.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                         `);
                     }
                 });

@@ -253,7 +253,62 @@ class GameState:
             }
         
         return trade_offs
+    
+    def _calcular_bonus_sinergias(self, decisoes: Dict[str, float], produtos: Dict) -> float:
+        """Calcular bônus monetário das sinergias ativas"""
+        bonus_total = 0.0
         
+        # Definição de sinergias (mesmas do otimizador)
+        grupos_sinergia = [
+            {
+                'produtos': ['Smartphone', 'Smartwatch'],
+                'bonus': 1.15,
+                'threshold_min': 10
+            },
+            {
+                'produtos': ['Desktop', 'Laptop'],
+                'bonus': 1.10,
+                'threshold_min': 10
+            },
+            {
+                'produtos': ['Camera', 'Smartphone'],
+                'bonus': 1.12,
+                'threshold_min': 5
+            }
+        ]
+        
+        # Para cada grupo de sinergia
+        for grupo in grupos_sinergia:
+            # Encontrar quantidade mínima comum entre produtos do grupo
+            quantidades = []
+            for produto in grupo['produtos']:
+                qtd = decisoes.get(produto, 0)
+                if qtd >= grupo['threshold_min']:
+                    quantidades.append(qtd)
+            
+            # Se todos os produtos do grupo atingem o threshold
+            if len(quantidades) >= 2:
+                qtd_minima = min(quantidades)
+                
+                # Aplicar bônus na quantidade mínima de cada produto
+                for produto in grupo['produtos']:
+                    if decisoes.get(produto, 0) >= grupo['threshold_min']:
+                        dados_produto = produtos.get(produto, {})
+                        preco = dados_produto.get('preco_venda', 0)
+                        
+                        # Calcular custo unitário (mesma lógica do otimizador)
+                        custo_unitario = (
+                            dados_produto.get('consumo_materia', 0) * GameConfig.CUSTOS_UNITARIOS_RECURSOS['materia_prima'] +
+                            dados_produto.get('consumo_energia', 0) * GameConfig.CUSTOS_UNITARIOS_RECURSOS['energia'] +
+                            dados_produto.get('consumo_trabalhadores', 0) * GameConfig.CUSTOS_UNITARIOS_RECURSOS['trabalhadores']
+                        )
+                        
+                        margem_base = preco - custo_unitario
+                        bonus_margem = qtd_minima * margem_base * (grupo['bonus'] - 1)
+                        bonus_total += bonus_margem
+        
+        return bonus_total
+    
     def processar_turno(self) -> Dict[str, any]:
         """Processar turno (chamado pelo admin)"""
         if not self.iteracao_aberta:
@@ -315,6 +370,10 @@ class GameState:
             receita_total = metricas['receita']
             custo_total = metricas['custo']
             lucro_turno = metricas['lucro']
+            
+            # APLICAR BÔNUS DE SINERGIAS AO LUCRO
+            bonus_sinergias_total = self._calcular_bonus_sinergias(decisoes, produtos_para_calculo)
+            lucro_turno += bonus_sinergias_total
             
             # Verificar violações de recursos FÍSICOS (não incluir dinheiro ainda)
             recursos_disponiveis = empresa['recursos_disponiveis']
@@ -535,13 +594,13 @@ class GameState:
             ranking.append({
                 'nome': nome,
                 'equipe': empresa['equipe'],
-                'lucro_total': lucro_ultima_iteracao,  # Lucro da última iteração
+                'lucro_ultimo_turno': lucro_ultima_iteracao,  # Lucro da última iteração apenas
                 'gap_percentual': empresa.get('gap_percentual'),  # GAP%
                 'recursos': empresa['recursos_disponiveis']
             })
         
         # Ordenar pelo lucro da ÚLTIMA ITERAÇÃO (melhor desempenho atual)
-        ranking.sort(key=lambda x: x['lucro_total'], reverse=True)
+        ranking.sort(key=lambda x: x['lucro_ultimo_turno'], reverse=True)
         return ranking
         
     def get_estatisticas_gerais(self) -> dict:
