@@ -191,6 +191,74 @@
                 {% endif %}
             </div>
         </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card bg-danger text-white">
+                <div class="stat-label">🔌 Chips Processamento
+                    {% if empresa.historico|length > 0 %}
+                    {% set ultimo_turno = empresa.historico[-1] %}
+                    {% set consumido = ultimo_turno.consumo.get('chips_processamento', 0) %}
+                    {% if consumido <= empresa.recursos_base.chips_processamento %}
+                        <span class="recurso-status recurso-ok">✓</span>
+                    {% else %}
+                        <span class="recurso-status recurso-violacao">✗</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('chips_processamento', 0) %}
+                {% set diferenca = empresa.recursos_base.chips_processamento - consumido %}
+                <div class="stat-value {% if diferenca < 0 %}text-danger{% endif %}" id="chips-valor">
+                    {% if diferenca % 1 == 0 %}{{ "%.0f"|format(diferenca) }}{% else %}{{ "%.1f"|format(diferenca) }}{% endif %}
+                </div>
+                {% else %}
+                <div class="stat-value" id="chips-valor">{% if empresa.recursos_base.chips_processamento % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.chips_processamento) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.chips_processamento) }}{% endif %}</div>
+                {% endif %}
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('chips_processamento', 0) %}
+                {% set percentual = (consumido / empresa.recursos_base.chips_processamento * 100) if empresa.recursos_base.chips_processamento > 0 else 0 %}
+                <div class="stat-info" id="chips-info">
+                    <small><strong>Capacidade:</strong> {% if empresa.recursos_base.chips_processamento % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.chips_processamento) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.chips_processamento) }}{% endif %}</small><br>
+                    <small><strong>Uso:</strong> {% if consumido % 1 == 0 %}{{ "%.0f"|format(consumido) }}{% else %}{{ "%.1f"|format(consumido) }}{% endif %} ({{ "%.0f"|format(percentual) }}%)</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card bg-secondary text-white">
+                <div class="stat-label">👨‍💻 Engenheiros Sênior
+                    {% if empresa.historico|length > 0 %}
+                    {% set ultimo_turno = empresa.historico[-1] %}
+                    {% set consumido = ultimo_turno.consumo.get('engenheiros_senior', 0) %}
+                    {% if consumido <= empresa.recursos_base.engenheiros_senior %}
+                        <span class="recurso-status recurso-ok">✓</span>
+                    {% else %}
+                        <span class="recurso-status recurso-violacao">✗</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('engenheiros_senior', 0) %}
+                {% set diferenca = empresa.recursos_base.engenheiros_senior - consumido %}
+                <div class="stat-value {% if diferenca < 0 %}text-danger{% endif %}" id="engenheiros-valor">
+                    {% if diferenca % 1 == 0 %}{{ "%.0f"|format(diferenca) }}{% else %}{{ "%.1f"|format(diferenca) }}{% endif %}
+                </div>
+                {% else %}
+                <div class="stat-value" id="engenheiros-valor">{% if empresa.recursos_base.engenheiros_senior % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.engenheiros_senior) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.engenheiros_senior) }}{% endif %}</div>
+                {% endif %}
+                {% if empresa.historico|length > 0 %}
+                {% set ultimo_turno = empresa.historico[-1] %}
+                {% set consumido = ultimo_turno.consumo.get('engenheiros_senior', 0) %}
+                {% set percentual = (consumido / empresa.recursos_base.engenheiros_senior * 100) if empresa.recursos_base.engenheiros_senior > 0 else 0 %}
+                <div class="stat-info" id="engenheiros-info">
+                    <small><strong>Capacidade:</strong> {% if empresa.recursos_base.engenheiros_senior % 1 == 0 %}{{ "%.0f"|format(empresa.recursos_base.engenheiros_senior) }}{% else %}{{ "%.1f"|format(empresa.recursos_base.engenheiros_senior) }}{% endif %}</small><br>
+                    <small><strong>Uso:</strong> {% if consumido % 1 == 0 %}{{ "%.0f"|format(consumido) }}{% else %}{{ "%.1f"|format(consumido) }}{% endif %} ({{ "%.0f"|format(percentual) }}%)</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <!-- Lucro do Último Turno -->
@@ -1564,12 +1632,62 @@
                         '<small><strong>Capacidade:</strong> ' + formatarNumero(data.recursos_base.trabalhadores, 1) + '</small><br>' +
                         '<small><strong>Uso:</strong> ' + formatarNumero(trabalhadoresConsumidos, 1) + ' (' + trabalhadoresPercent + '%)</small>'
                     );
+                    
+                    // Chips de Processamento (mostra diferença: capacidade - consumo)
+                    const chipsConsumidos = consumo.chips_processamento || 0;
+                    let chipsDiferenca = data.recursos_base.chips_processamento - chipsConsumidos;
+                    if (Math.abs(chipsDiferenca) < 0.01) chipsDiferenca = 0;
+                    const chipsPercent = (chipsConsumidos / data.recursos_base.chips_processamento * 100).toFixed(0);
+                    const chipsViolados = chipsConsumidos > data.recursos_base.chips_processamento + 0.01;
+                    const chipsIndicador = chipsViolados 
+                        ? '<span class="recurso-status recurso-violacao">✗</span>' 
+                        : '<span class="recurso-status recurso-ok">✓</span>';
+                    $('.stat-label:contains("🔌 Chips")').html('🔌 CHIPS PROCESSAMENTO ' + chipsIndicador);
+                    
+                    const chipsValor = $('#chips-valor');
+                    if (chipsViolados) {
+                        chipsValor.addClass('text-danger').removeClass('text-white');
+                    } else {
+                        chipsValor.removeClass('text-danger').addClass('text-white');
+                    }
+                    chipsValor.text(formatarNumero(chipsDiferenca, 1));
+                    
+                    $('#chips-info').html(
+                        '<small><strong>Capacidade:</strong> ' + formatarNumero(data.recursos_base.chips_processamento, 1) + '</small><br>' +
+                        '<small><strong>Uso:</strong> ' + formatarNumero(chipsConsumidos, 1) + ' (' + chipsPercent + '%)</small>'
+                    );
+                    
+                    // Engenheiros Sênior (mostra diferença: capacidade - consumo)
+                    const engenheirosConsumidos = consumo.engenheiros_senior || 0;
+                    let engenheirosDiferenca = data.recursos_base.engenheiros_senior - engenheirosConsumidos;
+                    if (Math.abs(engenheirosDiferenca) < 0.01) engenheirosDiferenca = 0;
+                    const engenheirosPercent = (engenheirosConsumidos / data.recursos_base.engenheiros_senior * 100).toFixed(0);
+                    const engenheirosViolados = engenheirosConsumidos > data.recursos_base.engenheiros_senior + 0.01;
+                    const engenheirosIndicador = engenheirosViolados 
+                        ? '<span class="recurso-status recurso-violacao">✗</span>' 
+                        : '<span class="recurso-status recurso-ok">✓</span>';
+                    $('.stat-label:contains("👨‍💻 Engenheiros")').html('👨‍💻 ENGENHEIROS SÊNIOR ' + engenheirosIndicador);
+                    
+                    const engenheirosValor = $('#engenheiros-valor');
+                    if (engenheirosViolados) {
+                        engenheirosValor.addClass('text-danger').removeClass('text-white');
+                    } else {
+                        engenheirosValor.removeClass('text-danger').addClass('text-white');
+                    }
+                    engenheirosValor.text(formatarNumero(engenheirosDiferenca, 1));
+                    
+                    $('#engenheiros-info').html(
+                        '<small><strong>Capacidade:</strong> ' + formatarNumero(data.recursos_base.engenheiros_senior, 1) + '</small><br>' +
+                        '<small><strong>Uso:</strong> ' + formatarNumero(engenheirosConsumidos, 1) + ' (' + engenheirosPercent + '%)</small>'
+                    );
                 } else {
                     // Sem histórico: mostrar capacidade total
                     $('#dinheiro-valor').removeClass('text-danger').addClass('text-white').text('R$ ' + formatarNumero(data.recursos_base.dinheiro, 2));
                     $('#materia-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.materia_prima, 1));
                     $('#energia-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.energia, 1));
                     $('#trabalhadores-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.trabalhadores, 1));
+                    $('#chips-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.chips_processamento, 1));
+                    $('#engenheiros-valor').removeClass('text-danger').addClass('text-white').text(formatarNumero(data.recursos_base.engenheiros_senior, 1));
                 }
                 
                 // Atualizar lucro último turno
