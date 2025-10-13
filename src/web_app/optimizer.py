@@ -16,6 +16,21 @@ except ImportError:
 from config.constants import GameConfig
 
 
+def arredondar_producao(valor, decimais=2):
+    """
+    Arredonda valor de produção/consumo evitando problemas de ponto flutuante.
+    Se o valor está muito próximo de um inteiro, arredonda para inteiro.
+    """
+    arredondado = round(valor, decimais)
+    # Se está muito próximo de zero, retorna zero
+    if abs(arredondado) < 0.001:
+        return 0
+    # Se está muito próximo de um inteiro, retorna inteiro
+    if abs(arredondado - round(arredondado)) < 0.001:
+        return round(arredondado)
+    return arredondado
+
+
 class ProductionOptimizer:
     """Otimizador de produção para maximizar lucro com sinergias de mercado"""
     
@@ -283,7 +298,7 @@ class ProductionOptimizer:
             for produto, var in produtos_vars.items():
                 quantidade = value(var) or 0
                 if quantidade > 0.01:  # Threshold para considerar produção
-                    producao_otima[produto] = round(quantidade, 2)
+                    producao_otima[produto] = arredondar_producao(quantidade, 2)
             
             # ========================================================================
             # CALCULAR RECURSOS UTILIZADOS E LUCRO
@@ -307,9 +322,9 @@ class ProductionOptimizer:
                 consumo_energia = quantidade * produto_info['consumo_energia']
                 consumo_trabalho = quantidade * produto_info['consumo_trabalhadores']
                 
-                recursos_utilizados['materia_prima'] += consumo_materia
-                recursos_utilizados['energia'] += consumo_energia
-                recursos_utilizados['trabalhadores'] += consumo_trabalho
+                recursos_utilizados['materia_prima'] += arredondar_producao(consumo_materia, 2)
+                recursos_utilizados['energia'] += arredondar_producao(consumo_energia, 2)
+                recursos_utilizados['trabalhadores'] += arredondar_producao(consumo_trabalho, 2)
                 
                 # Calcular custo monetário
                 custo_produto = (
@@ -343,11 +358,11 @@ class ProductionOptimizer:
                             bonus_receita = qtd_minima * margem_base * (grupo['bonus'] - 1)
                             receita_total += bonus_receita
             
-            recursos_utilizados['dinheiro'] = custo_total
+            recursos_utilizados['dinheiro'] = arredondar_producao(custo_total, 2)
             
-            # Recursos restantes
+            # Recursos restantes (arredondados para evitar -0.0)
             recursos_restantes = {
-                recurso: recursos_disponiveis[recurso] - recursos_utilizados[recurso]
+                recurso: arredondar_producao(recursos_disponiveis[recurso] - recursos_utilizados[recurso], 2)
                 for recurso in recursos_utilizados.keys()
             }
             
@@ -397,14 +412,16 @@ class ProductionOptimizer:
                     producao_otima.get(produto, 0) * produtos_para_otimizacao[produto].get('consumo_chips_processamento', 0)
                     for produto in producao_otima.keys()
                 ])
+                consumo_chips = arredondar_producao(consumo_chips, 2)
                 if consumo_chips > 0:
+                    disponivel_chips = arredondar_producao(recursos_disponiveis['chips_processamento'] - consumo_chips, 2)
                     recursos_especializados_uso['chips_processamento'] = {
                         'nome': GameConfig.NOMES_RECURSOS['chips_processamento'],
                         'emoji': GameConfig.EMOJI_RECURSO['chips_processamento'],
-                        'consumo': round(consumo_chips, 2),
+                        'consumo': consumo_chips,
                         'capacidade': recursos_disponiveis['chips_processamento'],
                         'utilizacao_percentual': round((consumo_chips / recursos_disponiveis['chips_processamento']) * 100, 1),
-                        'disponivel': round(recursos_disponiveis['chips_processamento'] - consumo_chips, 2)
+                        'disponivel': disponivel_chips
                     }
             
             # Engenheiros Sênior
@@ -413,14 +430,16 @@ class ProductionOptimizer:
                     producao_otima.get(produto, 0) * produtos_para_otimizacao[produto].get('consumo_engenheiros_senior', 0)
                     for produto in producao_otima.keys()
                 ])
+                consumo_engenheiros = arredondar_producao(consumo_engenheiros, 2)
                 if consumo_engenheiros > 0:
+                    disponivel_eng = arredondar_producao(recursos_disponiveis['engenheiros_senior'] - consumo_engenheiros, 2)
                     recursos_especializados_uso['engenheiros_senior'] = {
                         'nome': GameConfig.NOMES_RECURSOS['engenheiros_senior'],
                         'emoji': GameConfig.EMOJI_RECURSO['engenheiros_senior'],
-                        'consumo': round(consumo_engenheiros, 2),
+                        'consumo': consumo_engenheiros,
                         'capacidade': recursos_disponiveis['engenheiros_senior'],
                         'utilizacao_percentual': round((consumo_engenheiros / recursos_disponiveis['engenheiros_senior']) * 100, 1),
-                        'disponivel': round(recursos_disponiveis['engenheiros_senior'] - consumo_engenheiros, 2)
+                        'disponivel': disponivel_eng
                     }
             
             # DEBUG: Log da solução ótima

@@ -468,7 +468,9 @@
                         <div class="mb-3">
                             {% set capacidade = empresa.recursos_base.get(recurso, 0) %}
                             {% set uso = ultimo_consumo.get(recurso, 0) %}
-                            {% set restante = capacidade - uso %}
+                            {# Arredondar para evitar -0.0 devido a erros de ponto flutuante #}
+                            {% set restante = (capacidade - uso)|round(2) %}
+                            {% if restante|abs < 0.01 %}{% set restante = 0 %}{% endif %}
                             
                             <div class="d-flex justify-content-between mb-1">
                                 <small class="fw-bold">
@@ -1493,9 +1495,12 @@
                     
                     // Matéria-Prima (mostra diferença: capacidade - consumo)
                     const materiaConsumida = consumo.materia_prima || 0;
-                    const materiaDiferenca = data.recursos_base.materia_prima - materiaConsumida;
+                    let materiaDiferenca = data.recursos_base.materia_prima - materiaConsumida;
+                    // Arredondar para evitar -0.0 devido a erros de ponto flutuante
+                    if (Math.abs(materiaDiferenca) < 0.01) materiaDiferenca = 0;
                     const materiaPercent = (materiaConsumida / data.recursos_base.materia_prima * 100).toFixed(0);
-                    const materiaViolada = materiaConsumida > data.recursos_base.materia_prima;
+                    // Usar tolerância para evitar falsos positivos (600.0000001 > 600)
+                    const materiaViolada = materiaConsumida > data.recursos_base.materia_prima + 0.01;
                     const materiaIndicador = materiaViolada 
                         ? '<span class="recurso-status recurso-violacao">✗</span>' 
                         : '<span class="recurso-status recurso-ok">✓</span>';

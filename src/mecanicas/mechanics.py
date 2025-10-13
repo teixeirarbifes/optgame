@@ -52,8 +52,21 @@ class GameMechanics:
         """
         Calcula consumo de recursos baseado em:
         consumo_total_recurso = Σ(consumo_recurso_por_unidade × quantidade)
+        
+        Arredonda valores para evitar problemas de ponto flutuante (ex: 600.0000001)
         """
         from config.constants import GameConfig
+        
+        def arredondar_consumo(valor):
+            """Arredonda consumo evitando problemas de ponto flutuante"""
+            arredondado = round(valor, 2)
+            # Se está muito próximo de zero, retorna zero
+            if abs(arredondado) < 0.001:
+                return 0.0
+            # Se está muito próximo de um inteiro, retorna float do inteiro
+            if abs(arredondado - round(arredondado)) < 0.001:
+                return float(round(arredondado))
+            return arredondado
         
         consumo = {
             "materia_prima": 0.0,
@@ -89,6 +102,10 @@ class GameMechanics:
                 consumo_energia * quantidade * GameConfig.CUSTOS_UNITARIOS_RECURSOS.get('energia', 0.8) +
                 consumo_trab * quantidade * GameConfig.CUSTOS_UNITARIOS_RECURSOS.get('trabalhadores', 25.0)
             )
+
+        # Arredondar todos os valores para evitar problemas de ponto flutuante
+        for recurso in consumo:
+            consumo[recurso] = arredondar_consumo(consumo[recurso])
 
         return consumo
 
