@@ -1595,39 +1595,50 @@
                     }
                 }
                 
-                // Verificar se mudou de iteração ou estado
-                if (data.iteracao_atual !== ultimaIteracao || data.iteracao_aberta !== iteracaoAberta) {
+                // Verificar mudança de estado da iteração (SEMPRE verificar, independente do número)
+                // IMPORTANTE: Verificar estado ANTES de verificar número da iteração
+                
+                // Se abriu nova iteração (de fechada para aberta)
+                if (data.iteracao_aberta && !iteracaoAberta) {
+                    console.log('🟢 Nova iteração aberta! Recarregando página...');
+                    console.log('   - Iteração atual:', data.iteracao_atual);
+                    console.log('   - Estado anterior: iteracaoAberta =', iteracaoAberta);
+                    console.log('   - Estado novo: iteracao_aberta =', data.iteracao_aberta);
                     
-                    // Se abriu nova iteração
-                    if (data.iteracao_aberta && !iteracaoAberta) {
-                        console.log('Nova iteração aberta! Recarregando página...');
-                        iteracaoAberta = true;
-                        ultimaIteracao = data.iteracao_atual;
-                        processandoTurno = false;
-                        
-                        // Recarregar página para mostrar formulário
+                    iteracaoAberta = true;
+                    ultimaIteracao = data.iteracao_atual;
+                    processandoTurno = false;
+                    
+                    // Recarregar página para mostrar formulário
+                    location.reload();
+                    return; // Importante: parar execução após reload
+                } 
+                
+                // Se fechou iteração (turno processado - de aberta para fechada)
+                if (!data.iteracao_aberta && iteracaoAberta) {
+                    console.log('🔴 Turno processado! Recarregando resultados...');
+                    console.log('   - Iteração atual:', data.iteracao_atual);
+                    console.log('   - Estado anterior: iteracaoAberta =', iteracaoAberta);
+                    console.log('   - Estado novo: iteracao_aberta =', data.iteracao_aberta);
+                    
+                    iteracaoAberta = false;
+                    ultimaIteracao = data.iteracao_atual;
+                    
+                    // Mostrar status "CALCULANDO..."
+                    atualizarStatusJogo('calculando');
+                    
+                    // Aguardar 1 segundo e recarregar para garantir que backend salvou
+                    setTimeout(function() {
+                        console.log('Recarregando página com resultados...');
                         location.reload();
-                    } 
-                    // Se fechou iteração (turno processado)
-                    else if (!data.iteracao_aberta && iteracaoAberta) {
-                        console.log('Turno processado! Recarregando resultados...');
-                        iteracaoAberta = false;
-                        ultimaIteracao = data.iteracao_atual;
-                        
-                        // Mostrar status "CALCULANDO..."
-                        atualizarStatusJogo('calculando');
-                        
-                        // Aguardar 1 segundo e recarregar para garantir que backend salvou
-                        setTimeout(function() {
-                            console.log('Recarregando página com resultados...');
-                            location.reload();
-                        }, 1000);
-                    }
-                    // Se apenas mudou número da iteração
-                    else if (data.iteracao_atual !== ultimaIteracao) {
-                        console.log('Número da iteração mudou: ' + ultimaIteracao + ' -> ' + data.iteracao_atual);
-                        ultimaIteracao = data.iteracao_atual;
-                    }
+                    }, 1000);
+                    return; // Importante: parar execução após reload
+                }
+                
+                // Se apenas mudou número da iteração (mas manteve mesmo estado)
+                if (data.iteracao_atual !== ultimaIteracao) {
+                    console.log('📊 Número da iteração mudou: ' + ultimaIteracao + ' -> ' + data.iteracao_atual);
+                    ultimaIteracao = data.iteracao_atual;
                 }
                 
                 // Atualizar barras de progresso dos recursos
