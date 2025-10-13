@@ -2,6 +2,43 @@
 
 {% block title %}Dashboard Admin{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Timer de Rodada */
+    #timer-display {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.1em;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+    
+    #modalTimer .modal-content {
+        border: none;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    #modalTimer .btn-lg {
+        font-size: 1.1rem;
+        padding: 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    #modalTimer .btn-lg:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    #modalTimer .btn-lg i {
+        font-size: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
     <!-- Header -->
@@ -136,6 +173,11 @@
                         <div class="col"></div>
                         
                         <!-- Botões Administrativos - Sutis e Pequenos -->
+                        <div class="col-auto">
+                            <button class="btn btn-outline-danger btn-lg" onclick="mostrarTimer()" title="Timer de Rodada">
+                                <i class="bi bi-stopwatch"></i> Timer
+                            </button>
+                        </div>
                         <div class="col-auto">
                             <button class="btn btn-outline-primary btn-sm" onclick="mostrarTutorial()" title="Tutorial do Jogo">
                                 <i class="bi bi-question-circle"></i> <small>Tutorial</small>
@@ -1835,7 +1877,200 @@
     function mostrarTutorial() {
         $('#modalTutorial').modal('show');
     }
+    
+    // =========================================================================
+    // TIMER DE RODADA
+    // =========================================================================
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let timerPausado = false;
+    
+    function mostrarTimer() {
+        $('#modalTimer').modal('show');
+    }
+    
+    function formatarTempo(segundos) {
+        const horas = Math.floor(segundos / 3600);
+        const minutos = Math.floor((segundos % 3600) / 60);
+        const segs = segundos % 60;
+        
+        if (horas > 0) {
+            return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+        } else {
+            return `${minutos.toString().padStart(2, '0')}:${segs.toString().padStart(2, '0')}`;
+        }
+    }
+    
+    function atualizarDisplayTimer() {
+        $('#timer-display').text(formatarTempo(timerSeconds));
+        
+        // Atualizar cor baseado no tempo restante
+        const display = $('#timer-display');
+        if (timerSeconds <= 60) {
+            display.removeClass('text-warning text-success').addClass('text-danger');
+        } else if (timerSeconds <= 300) {
+            display.removeClass('text-danger text-success').addClass('text-warning');
+        } else {
+            display.removeClass('text-danger text-warning').addClass('text-success');
+        }
+    }
+    
+    function iniciarTimer() {
+        if (timerSeconds === 0) {
+            // Timer zerado, pedir tempo inicial
+            const minutos = parseInt(prompt('Quantos minutos deseja definir?', '5'));
+            if (minutos && minutos > 0) {
+                timerSeconds = minutos * 60;
+            } else {
+                return;
+            }
+        }
+        
+        timerPausado = false;
+        $('#btn-iniciar-timer').prop('disabled', true);
+        $('#btn-pausar-timer').prop('disabled', false);
+        
+        if (timerInterval) clearInterval(timerInterval);
+        
+        timerInterval = setInterval(() => {
+            if (!timerPausado) {
+                timerSeconds--;
+                atualizarDisplayTimer();
+                
+                // Alertas sonoros nos últimos segundos
+                if (timerSeconds === 60) {
+                    mostrarAlertaTimer('⚠️ 1 minuto restante!', 'warning');
+                } else if (timerSeconds === 30) {
+                    mostrarAlertaTimer('⚠️ 30 segundos restantes!', 'warning');
+                } else if (timerSeconds === 10) {
+                    mostrarAlertaTimer('🚨 10 segundos!', 'danger');
+                }
+                
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    mostrarAlertaTimer('⏰ TEMPO ESGOTADO!', 'danger');
+                    $('#btn-iniciar-timer').prop('disabled', false);
+                    $('#btn-pausar-timer').prop('disabled', true);
+                }
+            }
+        }, 1000);
+    }
+    
+    function pausarTimer() {
+        timerPausado = true;
+        $('#btn-iniciar-timer').prop('disabled', false);
+        $('#btn-pausar-timer').prop('disabled', true);
+    }
+    
+    function resetarTimer() {
+        if (confirm('Resetar o timer?')) {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            timerSeconds = 0;
+            timerPausado = false;
+            atualizarDisplayTimer();
+            $('#btn-iniciar-timer').prop('disabled', false);
+            $('#btn-pausar-timer').prop('disabled', true);
+            $('#timer-alertas').empty();
+        }
+    }
+    
+    function adicionarTempo(minutos) {
+        timerSeconds += minutos * 60;
+        atualizarDisplayTimer();
+        mostrarAlertaTimer(`➕ Adicionados ${minutos} minuto(s)`, 'info');
+    }
+    
+    function mostrarAlertaTimer(mensagem, tipo) {
+        const alertas = $('#timer-alertas');
+        const alerta = $(`
+            <div class="alert alert-${tipo} alert-dismissible fade show mb-2" role="alert">
+                ${mensagem}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `);
+        alertas.prepend(alerta);
+        
+        // Auto-remover após 5 segundos
+        setTimeout(() => {
+            alerta.fadeOut(() => alerta.remove());
+        }, 5000);
+    }
 </script>
+
+<!-- Modal Timer -->
+<div class="modal fade" id="modalTimer" tabindex="-1" aria-labelledby="modalTimerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalTimerLabel">
+                    <i class="bi bi-stopwatch"></i> Timer de Rodada
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <!-- Display do Timer -->
+                <div class="mb-4 p-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px;">
+                    <div id="timer-display" class="display-1 fw-bold text-white" style="font-size: 6rem; text-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                        00:00
+                    </div>
+                    <p class="text-white-50 mt-2 mb-0">Tempo da Rodada</p>
+                </div>
+                
+                <!-- Controles Principais -->
+                <div class="d-grid gap-3 mb-4">
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <button id="btn-iniciar-timer" class="btn btn-success btn-lg w-100" onclick="iniciarTimer()">
+                                <i class="bi bi-play-fill"></i><br>
+                                <small>INICIAR</small>
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button id="btn-pausar-timer" class="btn btn-warning btn-lg w-100" onclick="pausarTimer()" disabled>
+                                <i class="bi bi-pause-fill"></i><br>
+                                <small>PAUSAR</small>
+                            </button>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-danger btn-lg w-100" onclick="resetarTimer()">
+                                <i class="bi bi-arrow-counterclockwise"></i><br>
+                                <small>RESETAR</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Adicionar Tempo -->
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3"><i class="bi bi-plus-circle"></i> Adicionar Tempo</h6>
+                        <div class="btn-group w-100" role="group">
+                            <button class="btn btn-outline-primary" onclick="adicionarTempo(1)">
+                                <i class="bi bi-plus"></i> 1 min
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="adicionarTempo(5)">
+                                <i class="bi bi-plus"></i> 5 min
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="adicionarTempo(10)">
+                                <i class="bi bi-plus"></i> 10 min
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alertas -->
+                <div id="timer-alertas"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal Tutorial -->
 <div class="modal fade" id="modalTutorial" tabindex="-1" aria-labelledby="modalTutorialLabel" aria-hidden="true">
