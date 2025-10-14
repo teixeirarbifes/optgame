@@ -338,7 +338,7 @@
                             </thead>
                             <tbody id="rankingTable">
                                 {% for empresa in ranking %}
-                                <tr>
+                                <tr data-empresa="{{ empresa.nome }}">
                                     <td>
                                         {% if loop.index == 1 %}
                                         <i class="bi bi-trophy-fill text-warning"></i>
@@ -1228,7 +1228,7 @@
                         const lucroClass = empresa.lucro_ultimo_turno > 0 ? 'bg-success' : 'bg-danger';
                         
                         const rowRanking = `
-                            <tr>
+                            <tr data-empresa="${empresa.nome}">
                                 <td>${medalha}</td>
                                 <td>
                                     <strong>${empresa.nome}</strong>
@@ -1337,7 +1337,9 @@
                     }
                     
                     // Atualizar ranking
-                    const rankingRow = $('#rankingTable tr').eq(index);
+                    // CORRIGIDO: Buscar linha pelo atributo data-empresa
+                    const rankingRow = $(`#rankingTable tr[data-empresa="${empresa.nome}"]`);
+                    
                     if (rankingRow.length) {
                         const lucroClass = empresa.lucro_ultimo_turno > 0 ? 'bg-success' : 'bg-danger';
                         rankingRow.find('td:eq(2)').html(`
